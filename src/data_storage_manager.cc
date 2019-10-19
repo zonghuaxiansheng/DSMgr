@@ -2,9 +2,15 @@
 
 namespace ustc_dbms {
 
-  DSMgr::DSMgr(bool split=false) {
+  DSMgr::DSMgr() {
     std::cout << "DSMgr: " << "Start Data Storage Manager ..." << std::endl;
-    this->db_split_ = split;
+  }
+
+  DSMgr::~DSMgr() {
+    if (this->db_ptr_.size() > 0) {
+      this->ReleaseDbPtr();
+    }
+    std::cout << "DSMgr: " << "Shutdown Data Storage Manager ..." << std::endl;
   }
 
   bool DSMgr::OpenDbFile(std::string file_name) {
@@ -15,29 +21,16 @@ namespace ustc_dbms {
       return false;
     }
 
-    if (this->db_split_) {
-      this->db_ptr_.push_back(db_file);
-    } else {
-      assert(this->db_ptr_.size() == 0);
-      // this->db_ptr_.clear();
-      this->db_ptr_.push_back(db_file);
-    }
+    assert(this->db_ptr_.size() == 0);
+    this->db_ptr_.push_back(db_file);
     return true;
   }
 
-  bool DSMgr::CloseDbFile(int file_index=0) {
-    if((file_index > 0) && !this->db_split_) {
-      std::cerr << "DSMgr: " << __func__ << " close db file failed !" << std::endl;
-      return false;
-    }
-
-    if (this->db_split_) {
-      // TODO
-    } else {
-      this->db_ptr_[file_index]->close();
-      this->ReleaseDbPtr();
-      this->db_ptr_.clear();
-    }
+  bool DSMgr::CloseDbFile() {
+    assert(this->db_ptr_.size() == 1);
+    this->db_ptr_[0]->close();
+    this->ReleaseDbPtr();
+    this->db_ptr_.clear();
     return true;
   }
 
@@ -75,51 +68,48 @@ namespace ustc_dbms {
   }
 
   void DSMgr::Seek(int offset, DB_SEEK_E pos, int is_put) {
-#if 0
-    if (this->db_split_) {
-      ...
-    } else {
-#endif
-    // db_split_ == false
+    auto db_ptr = this->db_ptr_[0];
     if (is_put) {
-      /*
-       * \seek write file.
-       */
+      /* \brief Seek write file. */
       switch(pos) {
         case DB_SEEK_BEG:
-          this->db_ptr_[0]->seekp(offset, std::ios::beg);
+          db_ptr->seekp(offset, std::ios::beg);
           break;
         case DB_SEEK_CUR:
-          this->db_ptr_[0]->seekp(offset, std::ios::cur);
+          db_ptr->seekp(offset, std::ios::cur);
           break;
         case DB_SEEK_END:
-          this->db_ptr_[0]->seekp(offset, std::ios::end);
+          db_ptr->seekp(offset, std::ios::end);
           break;
         default:
           std::cerr << "DSMgr: " << __func__ << " seek type error !" << std::endl;
           break;
       }
     } else {
-      /*
-       * \seek read file.
-       */
+      /* \brief Seek read file. */
       switch(pos) {
         case DB_SEEK_CUR:
-          this->db_ptr_[0]->seekg(offset, std::ios::cur);
+          db_ptr->seekg(offset, std::ios::cur);
           break;
         case DB_SEEK_BEG:
-          this->db_ptr_[0]->seekg(offset, std::ios::beg);
+          db_ptr->seekg(offset, std::ios::beg);
           break;
         case DB_SEEK_END:
-          this->db_ptr_[0]->seekg(offset, std::ios::end);
+          db_ptr->seekg(offset, std::ios::end);
           break;
         default:
           std::cerr << "DSMgr: " << __func__ << " seek type error !" << std::endl;
           break;
       }      
     }
-#if 0
-    }
-#endif
   }
+
+  std::fstream * DSMgr::GetFile() {
+    if (this->db_ptr_.size() > 0) {
+      return this->db_ptr_[0];
+    } else {
+      return NULL;
+    }
+  }
+
 }
