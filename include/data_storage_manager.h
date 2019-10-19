@@ -17,10 +17,10 @@ typedef unsigned char uint8_t;
 
 enum DB_SSEK_E {DB_SEEK_BEG, DB_SEEK_CUR, DB_SEEK_END};
 
-
 struct PCB {
   /*
-   * \brief A bit map for all pages, valid is 1, invalid is 0.
+   * \brief A bit map for all pages
+   * \valid is 1, invalid is 0.
    */
   std::vector<uint8_t> bit_map_;
   /*
