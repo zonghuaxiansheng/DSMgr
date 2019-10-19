@@ -1,0 +1,32 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+PROJECT(ustc_dbms)
+
+SET(CMAKE_CXX_FLAGS "-fPIC -g -m64 -std=c++17")
+
+SET(BASE_DIR  ${CMAKE_CURRENT_SOURCE_DIR})
+
+INCLUDE_DIRECTORIES(${BASE_DIR}/include)
+
+SET(BASE_SRC
+  ${BASE_DIR}/src/buffer_manager.cc
+  ${BASE_DIR}/src/data_storage_manager.cc
+  )
+
+SET(TEST_SRC
+  ${BASE_SRC}
+  ${BASE_DIR}/test/ustc_dbms_test.cc
+  )
+
+# SET(LIB_SRC
+#   ${BASE_SRC}
+#   ${BASE_DIR}/lib/ustc_dbms_lib.cc
+#   )
+
+SET(EXECUTABLE_OUTPUT_PATH ${BASE_DIR}/out)
+SET(LIBRARY_OUTPUT_PATH ${BASE_DIR}/out)
+
+ADD_EXECUTABLE(ustc_dbms_test ${TEST_SRC})
+SET_TARGET_PROPERTIES(ustc_dbms_test PROPERTIES LINKER_LANGUAGE CXX)
+
+# ADD_LIBRARY(_ustc_dbms SHARED ${LIB_SRC})
+# SET_TARGET_PROPERTIES(_ustc_dbms PROPERTIES LINKER_LANGUAGE CXX)
