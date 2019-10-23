@@ -34,20 +34,26 @@ namespace ustc_dbms {
     return true;
   }
 
-  DbFrame DSMgr::ReadPage(int page_id) const {
-    int page_offset = page_id * DB_PAGE_SIZE;
-    this->Seek(page_offset, DB_SEEK_BEG, false);
-
-    DbPage db_page;
-    this->db_ptr_[0]->read(&(db_page.page_), DB_PAGE_SIZE);
-    if (*(this->db_ptr_[0])) {
-      std::cout << "DSMgr: <" << __func__ << "> read page(" << page_id << ") successfully !" << std::endl;
-    } else {
-      std::cerr << "DSMgr: <" << __func__ << "> error, only read " << this->db_ptr_[0]->gcount() << " bytes !" << std::endl;
-    }
-
+  DbFrame DSMgr::ReadPage(int page_id, int page_num) {
+    int page_offset;
     DbFrame db_frame;
-    db_frame.frame_.push_back(std::make_pair(page_id, db_page));
+    for (int i = 0; i < page_num; i ++) {
+      // Get page offset.
+      int incr_id = page_id + i; 
+      page_offset = incr_id * DB_PAGE_SIZE;
+      this->Seek(page_offset, DB_SEEK_BEG, false);
+      // Read one page.
+      DbPage db_page;
+      this->db_ptr_[0]->read(&(db_page.page_), DB_PAGE_SIZE);
+      if (*(this->db_ptr_[0])) {
+        std::cout << "DSMgr: <" << __func__ << "> read page(" << incr_id << ") successfully !" << std::endl;
+      } else {
+        std::cerr << "DSMgr: <" << __func__ << "> error, only read " \
+                  << this->db_ptr_[0]->gcount() << " bytes !" << std::endl;
+      }
+      // Push page into frame.
+      db_frame.frame_.push_back(std::make_pair(incr_id, db_page));
+    }
     return db_frame;
   }
 

@@ -120,8 +120,8 @@ struct PCB {
 class DSMgr {
   private:
     /*
-    * \brief A structure of page control block.
-    */
+     * \brief A structure of page control block.
+     */
     PCB db_pcb_;
     /*
      * \brief A structure of db_file's handle.
@@ -135,7 +135,7 @@ class DSMgr {
      */
     bool OpenDbFile(std::string filename);
     bool CloseDbFile(int file_index=0);
-    DbFrame ReadPage(int page_id);
+    DbFrame ReadPage(int page_id, int page_num);
     bool WritePage(int frame_id, DbFrame frame);
     void Seek(int offset, int pos, int is_put);
     std::fstream * GetFile();
