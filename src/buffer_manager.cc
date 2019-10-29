@@ -3,10 +3,15 @@
 namespace ustc_dbms {
 BMgr::BMgr(int bsize, int fsize) {
   std::cout << "BMgr: " << "Start Buffer Manager ..." << std::endl;
+  // Initial buffer size and frame size
   this->buffer_size_ = bsize;
   this->frame_size_ = fsize;
+  // Initial BCB
   this->db_bcb_ = new BCB(bsize, fsize);
+  this->db_bcb_->InitBcb();
+  // Allocate memory space for buffer
   this->db_buffer_ = new char[(bsize * fsize) * (DB_PAGE_SIZE * sizeof(char))];
+  // Initial DSMgr
   this->db_dsmgr_ = new DSMgr();
 }
 BMgr::~BMgr() {
@@ -19,6 +24,9 @@ int BMgr::Hash(int page_id) {
   return page_id % this->buffer_size_;
 }
 int BMgr::FixPage(int page_id, int port) {
+
+  std::cout << "BMgr: " << __func__ << " page_id(" << page_id << ")" << std::endl;
+
   auto index = this->Hash(page_id);
   auto& fcb = this->db_bcb_->GetFcb(index);
 
@@ -76,6 +84,7 @@ int BMgr::FixPage(int page_id, int port) {
     } 
   }
 #else
+  std::cout << "BMgr: " << __func__ << " FixPage need call DSMgr to read page back !" << std::endl;
 #endif
   // this->WriteIntoPage(page_data, pindex);
   return index;
