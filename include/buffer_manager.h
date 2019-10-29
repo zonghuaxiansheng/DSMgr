@@ -9,6 +9,8 @@ namespace ustc_dbms {
 enum FRAME_STATUS_E {EMPTY, CLEAN, DIRTY};
 typedef FRAME_STATUS_E PAGE_STATUS_E;
 
+
+#ifdef USE_MULT_PAGES
 /*
  * \brief Frame's page control block.
  */
@@ -24,7 +26,8 @@ struct FPCB {
 };    // struct FPCB
 
 /*
- * \brief Frame control block.
+ * \brief Frame control block,
+ * \with multiply pages.
  */
 struct FCB {
   /* \brief Vector of FPCB of one frame. */
@@ -34,6 +37,22 @@ struct FCB {
   /* \brief The size of pages of one frame contian. */
   int frame_size_;
 };    // struct FCB
+#else
+/*
+ * \brief Frame control block,
+ * \with single page.
+ */
+struct FCB {
+  /* \brief Page id. */
+  int page_id_;
+  /* \brief The frame id of the page. */
+  int frame_id_;
+  /* \brief Count. */
+  int count_;
+  /* \brief Page status. */
+  FRAME_STATUS_E frame_status_;
+};
+#endif
 
 /*
  * \brief Buffer control block.
@@ -49,7 +68,7 @@ struct BCB {
    * \brief BCB functions.
    */
   // BCB
-  BCB(int bsize=1024, int fsize=4) {
+  BCB(int bsize=1024, int fsize=1) {
     this->buffer_size_ = bsize;
     this->frame_size_ = fsize;    
   }
@@ -68,8 +87,8 @@ struct BCB {
     this->bcb_.clear();
     for (int i = 0; i < this->buffer_size_; i ++) {
       FCB fcb;
-      fcb.frame_size_ = 4;
-      fcb.frame_pcb_.clear();
+      fcb.frame_id_ = i;
+      fcb.count_ = 0;
       fcb.frame_status_ = FRAME_STATUS_E::EMPTY;
       this->bcb_.push_back(fcb);
     }
@@ -90,7 +109,6 @@ struct BCB {
   inline bool ResetFcb(int index) {
     assert(index < this->buffer_size_);
     auto& fcb = this->bcb_[index];
-    fcb.frame_pcb_.clear();
     fcb.frame_status_ = FRAME_STATUS_E::EMPTY;
     return true;
   }
@@ -118,7 +136,7 @@ class BMgr {
     /* \brief The size of pages of one frame. */
     int frame_size_;
   public:
-    BMgr(int bsize=1024, int fsize=4);
+    BMgr(int bsize=1024, int fsize=1);
     int Hash(int page_id);
 
 

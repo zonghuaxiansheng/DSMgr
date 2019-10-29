@@ -1,7 +1,7 @@
 #include "buffer_manager.h"
 
 namespace ustc_dbms {
-BMgr::BMgr(int bsize=1024, int fsize=4) {
+BMgr::BMgr(int bsize=1024, int fsize=1) {
   std::cout << "BMgr: " << "Start Buffer Manager ..." << std::endl;
   this->buffer_size_ = bsize;
   this->frame_size_ = fsize;
@@ -22,12 +22,19 @@ int BMgr::FixPage(int page_id, int port) {
   auto index = this->Hash(page_id);
   auto& fcb = this->db_bcb_->GetFcb(index);
 
+#ifdef USE_MULT_PAGES
   for (auto fpcb : fcb.frame_pcb_) {
     if (fpcb.page_id_ == page_id) {
       return fpcb.frame_id_;
     }
   }
+#else
+  if (fcb.page_id_ == page_id) {
+    return fcb.frame_id_;
+  }
+#endif
 
+#ifdef USE_MULT_PAGES
   int pindex = 0;
   auto page_data = this->db_dsmgr_->ReadPage(page_id, 1);
   auto frame_size = fcb.frame_pcb_.size();
@@ -68,6 +75,8 @@ int BMgr::FixPage(int page_id, int port) {
       fpcb.page_status_ = PAGE_STATUS_E::CLEAN;
     } 
   }
+#else
+#endif
   thie->WriteIntoPage(page_data, pindex);
   return index;
 }
