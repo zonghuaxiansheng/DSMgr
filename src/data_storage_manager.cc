@@ -26,7 +26,7 @@ namespace ustc_dbms {
     return true;
   }
 
-  bool DSMgr::CloseDbFile() {
+  bool DSMgr::CloseDbFile(int file_index) {
     assert(this->db_ptr_.size() == 1);
     this->db_ptr_[0]->close();
     this->ReleaseDbPtr();
@@ -44,7 +44,7 @@ namespace ustc_dbms {
       this->Seek(page_offset, DB_SEEK_BEG, false);
       // Read one page.
       DbPage db_page;
-      this->db_ptr_[0]->read(&(db_page.page_), DB_PAGE_SIZE);
+      this->db_ptr_[0]->read(db_page.page_, DB_PAGE_SIZE);
       if (*(this->db_ptr_[0])) {
         std::cout << "DSMgr: <" << __func__ << "> read page(" << incr_id << ") successfully !" << std::endl;
       } else {
@@ -59,16 +59,16 @@ namespace ustc_dbms {
 
   bool DSMgr::WritePage(int frame_id, DbFrame frame) {
     if (frame.dirty_) {
-      for (auto page : frame) {
+      for (auto page : frame.frame_) {
         int page_id = page.first;
         DbPage db_page = page.second;
         int page_offset = page_id * DB_PAGE_SIZE;
         this->Seek(page_offset, DB_SEEK_BEG, true);
-        this->db_ptr_[0]->write(&(db_page.page_), DB_PAGE_SIZE);
+        this->db_ptr_[0]->write(db_page.page_, DB_PAGE_SIZE);
         std::cout << "DSMgr: <" << __func__ << "> write page(" << page_id << ") successfully !" << std::endl;
       }
     } else {
-      std::cout << "DSMgr: <" << __func__ << "> page(" << page_id << ") dirty is false !" << std::endl;
+      std::cout << "DSMgr: <" << __func__ << "> frame(" << frame_id << ") dirty is false !" << std::endl;
     }
     return true;
   }

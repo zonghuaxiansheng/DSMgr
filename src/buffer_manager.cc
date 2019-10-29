@@ -1,7 +1,7 @@
 #include "buffer_manager.h"
 
 namespace ustc_dbms {
-BMgr::BMgr(int bsize=1024, int fsize=1) {
+BMgr::BMgr(int bsize, int fsize) {
   std::cout << "BMgr: " << "Start Buffer Manager ..." << std::endl;
   this->buffer_size_ = bsize;
   this->frame_size_ = fsize;
@@ -77,7 +77,7 @@ int BMgr::FixPage(int page_id, int port) {
   }
 #else
 #endif
-  thie->WriteIntoPage(page_data, pindex);
+  // this->WriteIntoPage(page_data, pindex);
   return index;
 }
 }

@@ -6,7 +6,6 @@
 #include <fstream>
 #include <string>
 #include <map>
-#include <pair>
 
 #define CHECK(x,y) if(!x) std::cout << "CHECK_FAIL: " << y << std::endl;
 
@@ -15,7 +14,7 @@ namespace ustc_dbms {
 
 typedef unsigned char uint8_t;
 
-enum DB_SSEK_E {DB_SEEK_BEG, DB_SEEK_CUR, DB_SEEK_END};
+enum DB_SEEK_E {DB_SEEK_BEG, DB_SEEK_CUR, DB_SEEK_END};
 
 struct PCB {
   /*
@@ -32,7 +31,7 @@ struct PCB {
    */
   int page_num_;
 
-  void GetPageNum() const {
+  int GetPageNum() const {
     return this->page_num_;
   }
 
@@ -63,7 +62,7 @@ struct PCB {
   }
 
   std::pair<int, bool> GetValidPageIndex() {
-    for (auto i; i < this->bit_map_.size(); i++) {
+    for (int i; i < this->bit_map_.size(); i++) {
       if (this->bit_map_[i]) {
         return std::make_pair(i, true);
       }
@@ -133,11 +132,11 @@ class DSMgr {
     /*
      * \brief Functoins of db file operation.
      */
-    bool OpenDbFile(std::string filename);
+    bool OpenDbFile(std::string file_name);
     bool CloseDbFile(int file_index=0);
     DbFrame ReadPage(int page_id, int page_num);
     bool WritePage(int frame_id, DbFrame frame);
-    void Seek(int offset, int pos, int is_put);
+    void Seek(int offset, DB_SEEK_E pos, int is_put);
     std::fstream * GetFile();
     /*
      * \brief Functions of PCB operation.

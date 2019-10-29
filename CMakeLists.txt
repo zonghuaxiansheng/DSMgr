@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
-PROJECT(ustc_dbms)
+PROJECT(ustc_dbms C CXX)
 
 SET(CMAKE_CXX_FLAGS "-fPIC -g -m64 -std=c++17")
 

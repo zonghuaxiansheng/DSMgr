@@ -81,7 +81,7 @@ struct BCB {
     if (buffer_size > 0) {
       this->SetBufferSize(buffer_size);
     } else {
-      std::cout << "BMgr: " << __FUNC_ << " Forget set buffer_size_ ? buffer_size_ will be old value(" \
+      std::cout << "BMgr: " << __func__ << " Forget set buffer_size_ ? buffer_size_ will be old value(" \
                 << this->buffer_size_ << ") !" << std::endl;
     }
     this->bcb_.clear();
@@ -137,6 +137,7 @@ class BMgr {
     int frame_size_;
   public:
     BMgr(int bsize=1024, int fsize=1);
+    ~BMgr();
     int Hash(int page_id);
 
 

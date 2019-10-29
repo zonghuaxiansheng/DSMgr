@@ -1,7 +1,9 @@
 #ifndef _USTC_TYPES_H_
 #define _USTC_TYPES_H_
 
-#include <utinity>
+#include <assert.h>
+#include <utility>
+#include <vector>
 
 #define FRAMESIZE 4096
 #define DEFBUFSIZE  1024
@@ -10,14 +12,6 @@
 #define DB_PAGE_SIZE 4096
 
 namespace ustc_dbms {
-
-struct DbFrame {
-  /*!
-   *\ brief one frame contains FRAME_LINE_NUM block.
-   */
-  std::vector<std::pair<int, DbPage>> frame_;
-  bool dirty_;
-};    // struct DbFrame
 
 struct DbPage {
   /*!
@@ -41,6 +35,14 @@ struct DbPage {
   }
 #endif
 };    // struct DbPage
+
+struct DbFrame {
+  /*!
+   *\ brief one frame contains FRAME_LINE_NUM block.
+   */
+  std::vector<std::pair<int, DbPage>> frame_;
+  bool dirty_;
+};    // struct DbFrame
 
 }   // namespace ustc_dbms
 
