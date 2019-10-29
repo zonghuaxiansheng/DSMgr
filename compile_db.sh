@@ -1,4 +1,4 @@
-echo "Start Compile DSMgr ..."
+echo "Build DSMgr Start ..."
 mkdir build
 cd build
 cmake ..
