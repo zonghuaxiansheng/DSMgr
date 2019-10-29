@@ -139,7 +139,7 @@ class BMgr {
     BMgr(int bsize=1024, int fsize=1);
     ~BMgr();
     int Hash(int page_id);
-
+    bool InitBMgrTest(int test_size);
 
     // Interface functions
     int FixPage(int page_id, int prot);

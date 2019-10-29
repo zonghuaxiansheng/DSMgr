@@ -20,6 +20,23 @@ BMgr::~BMgr() {
   delete this->db_dsmgr_;
   std::cout << "BMgr: " << "Shutdown Buffer Manager ..." << std::endl;
 }
+bool BMgr::InitBMgrTest(int test_size) {
+  for (int i = 0; i < test_size; i ++) {
+    // New one page
+    auto page_id = this->db_dsmgr_->NewPage();
+    // Store page info into BCB
+    auto index = this->Hash(page_id);
+    auto& fcb = this->db_bcb_->GetFcb(index);
+    fcb.page_id_ = page_id;
+    fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
+    // Load page data into buffer
+    auto db_frame = this->db_dsmgr_->ReadPage(page_id, 1);
+    auto page_data = db_frame.frame_.second;
+    for (int i = 0; i < DB_PAGE_SIZE; i ++) {
+      this->db_buffer_[fcb.frame_id_*DB_PAGE_SIZE + i] = page_data.page_[i];
+    }
+  }
+}
 int BMgr::Hash(int page_id) {
   return page_id % this->buffer_size_;
 }

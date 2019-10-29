@@ -57,7 +57,7 @@ namespace ustc_dbms {
     return db_frame;
   }
 
-  bool DSMgr::WritePage(int frame_id, DbFrame frame) {
+  bool DSMgr::WritePage(int frame_id, DbFrame& frame) {
     if (frame.dirty_) {
       for (auto page : frame.frame_) {
         int page_id = page.first;

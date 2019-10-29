@@ -135,7 +135,7 @@ class DSMgr {
     bool OpenDbFile(std::string file_name);
     bool CloseDbFile(int file_index=0);
     DbFrame ReadPage(int page_id, int page_num);
-    bool WritePage(int frame_id, DbFrame frame);
+    bool WritePage(int frame_id, DbFrame& frame);
     void Seek(int offset, DB_SEEK_E pos, int is_put);
     std::fstream * GetFile();
     /*
@@ -143,6 +143,11 @@ class DSMgr {
      */
     int NewPage() {
       auto page_id = this->db_pcb_.IncrOnePage();
+      DbPage db_page;
+      DbFrame db_frame;
+      db_frame.frame_.push_back(std::make_pair(page_id, db_page));
+      db_frame.dirty_ = true;
+      this->WritePage(0, db_frame);
       return page_id;
     }
     bool DelPage(int page_id) {
