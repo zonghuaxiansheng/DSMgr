@@ -29,7 +29,7 @@ bool BMgr::InitBMgrTest(int test_size) {
     auto& fcb = this->db_bcb_->GetFcb(index);
     fcb.page_id_ = page_id;
     fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
-    // Load page data into buffer
+    // Store page data into buffer
     auto db_frame = this->db_dsmgr_->ReadPage(page_id, 1);
     auto page_data = db_frame.frame_.second;
     for (int i = 0; i < DB_PAGE_SIZE; i ++) {
