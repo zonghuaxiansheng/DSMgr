@@ -2,13 +2,15 @@
 
 namespace ustc_dbms {
 
-  DSMgr::DSMgr() {
+  DSMgr::DSMgr(std::string db_path) {
     std::cout << "DSMgr: " << "Start Data Storage Manager ..." << std::endl;
+    this->OpenDbFile(db_path);
   }
 
   DSMgr::~DSMgr() {
     if (this->db_ptr_.size() > 0) {
-      this->ReleaseDbPtr();
+      this->CloseDbFile();
+      // this->ReleaseDbPtr();
     }
     std::cout << "DSMgr: " << "Shutdown Data Storage Manager ..." << std::endl;
   }

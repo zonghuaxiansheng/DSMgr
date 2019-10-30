@@ -136,7 +136,9 @@ class BMgr {
     /* \brief The size of pages of one frame. */
     int frame_size_;
   public:
-    BMgr(int bsize=1024, int fsize=1);
+    BMgr(int bsize=1024,
+         int fsize=1,
+         std::string db_path="out/default.db");
     ~BMgr();
     int Hash(int page_id);
     bool InitBMgrTest(int test_size);

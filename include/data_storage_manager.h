@@ -54,9 +54,13 @@ struct PCB {
       }
     }
 #else
-    auto end_iter = this->vp_cvt_.end();
-    end_iter --;
-    max_v_id = end_iter->first;
+    if (this->vp_cvt_.size() > 0) {
+      auto end_iter = this->vp_cvt_.end();
+      end_iter --;
+      max_v_id = end_iter->first;
+    } else {
+      max_v_id = 0;
+    }
 #endif
     return max_v_id;
   }
@@ -103,11 +107,13 @@ struct PCB {
     if (!p_valid) {
       p_id = NewOnePage();
     }
+    std::cout << "BSMgr: " << __func__ << " p_id is " << p_id << std::endl;
     // Set bit_map_[p_id] = used
     SetBitMap(p_id, 0);
     // Get a new v_id
     auto v_id = GetMaxVPage();
     v_id ++;
+    std::cout << "BSMgr: " << __func__ << " v_id is " << v_id << std::endl;
     // Insert [v_id,p_id] into v2p map.
     this->vp_cvt_.insert(std::make_pair(v_id, p_id));
     // Increase page num.
@@ -127,7 +133,7 @@ class DSMgr {
      */
     std::vector<std::fstream *> db_ptr_;
   public:
-    DSMgr();
+    DSMgr(std::string db_path="./out/default.db");
     ~DSMgr();
     /*
      * \brief Functoins of db file operation.
@@ -163,7 +169,7 @@ class DSMgr {
      * \brief Release the db_handle's memory space.
      */
     void ReleaseDbPtr() {
-      for (auto db_ptr : this->db_ptr_) {
+      for (auto& db_ptr : this->db_ptr_) {
         delete db_ptr;
       }
     }

@@ -1,7 +1,9 @@
 #include "buffer_manager.h"
 
 namespace ustc_dbms {
-BMgr::BMgr(int bsize, int fsize) {
+BMgr::BMgr(int bsize,
+           int fsize,
+           std::string db_path) {
   std::cout << "BMgr: " << "Start Buffer Manager ..." << std::endl;
   // Initial buffer size and frame size
   this->buffer_size_ = bsize;
@@ -12,7 +14,8 @@ BMgr::BMgr(int bsize, int fsize) {
   // Allocate memory space for buffer
   this->db_buffer_ = new char[(bsize * fsize) * (DB_PAGE_SIZE * sizeof(char))];
   // Initial DSMgr
-  this->db_dsmgr_ = new DSMgr();
+  // std::string db_path = "./out/default.db";
+  this->db_dsmgr_ = new DSMgr(db_path);
 }
 BMgr::~BMgr() {
   delete this->db_bcb_;
@@ -31,7 +34,7 @@ bool BMgr::InitBMgrTest(int test_size) {
     fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
     // Store page data into buffer
     auto db_frame = this->db_dsmgr_->ReadPage(page_id, 1);
-    auto page_data = db_frame.frame_.second;
+    auto page_data = db_frame.frame_[0].second;
     for (int i = 0; i < DB_PAGE_SIZE; i ++) {
       this->db_buffer_[fcb.frame_id_*DB_PAGE_SIZE + i] = page_data.page_[i];
     }
