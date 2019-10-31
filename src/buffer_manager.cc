@@ -10,7 +10,7 @@ BMgr::BMgr(int bsize,
   this->frame_size_ = fsize;
   // Initial BCB
   this->db_bcb_ = new BCB(bsize, fsize);
-  this->db_bcb_->InitBcb();
+  this->db_bcb_->InitBcb(bsize);
   // Allocate memory space for buffer
   this->db_buffer_ = new char[(bsize * fsize) * (DB_PAGE_SIZE * sizeof(char))];
   // Initial DSMgr
@@ -45,7 +45,7 @@ int BMgr::Hash(int page_id) {
 }
 int BMgr::FixPage(int page_id, int port) {
 
-  std::cout << "BMgr: " << __func__ << " page_id(" << page_id << ")" << std::endl;
+  std::cout << "BMgr: " << __func__ << " page_id[" << page_id << "]" << std::endl;
 
   auto index = this->Hash(page_id);
   auto& fcb = this->db_bcb_->GetFcb(index);

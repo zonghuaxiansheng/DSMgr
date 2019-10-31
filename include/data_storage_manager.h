@@ -1,6 +1,7 @@
 #ifndef _USTC_DATA_STORAGE_MANAGER_H_
 #define _USTC_DATA_STORAGE_MANAGER_H_
 
+#include "string.h"
 #include "types.h"
 #include <iostream>
 #include <fstream>
@@ -107,13 +108,12 @@ struct PCB {
     if (!p_valid) {
       p_id = NewOnePage();
     }
-    std::cout << "BSMgr: " << __func__ << " p_id is " << p_id << std::endl;
     // Set bit_map_[p_id] = used
     SetBitMap(p_id, 0);
     // Get a new v_id
     auto v_id = GetMaxVPage();
     v_id ++;
-    std::cout << "BSMgr: " << __func__ << " v_id is " << v_id << std::endl;
+    std::cout << "DSMgr: " << __func__ << " Increase page successfully, with logical_id[" << v_id << "] -> pyhsical_id[" << p_id << "]" << std::endl;
     // Insert [v_id,p_id] into v2p map.
     this->vp_cvt_.insert(std::make_pair(v_id, p_id));
     // Increase page num.
@@ -150,6 +150,7 @@ class DSMgr {
     int NewPage() {
       auto page_id = this->db_pcb_.IncrOnePage();
       DbPage db_page;
+      memset(db_page.page_, '0', DB_PAGE_SIZE);
       DbFrame db_frame;
       db_frame.frame_.push_back(std::make_pair(page_id, db_page));
       db_frame.dirty_ = true;

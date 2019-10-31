@@ -42,15 +42,18 @@ namespace ustc_dbms {
     for (int i = 0; i < page_num; i ++) {
       // Get page offset.
       int incr_id = page_id + i; 
-      page_offset = incr_id * DB_PAGE_SIZE;
+      auto [p_id, p_valid] = this->db_pcb_.V2PConvert(incr_id);
+      assert(p_valid == true);
+      page_offset = p_id * DB_PAGE_SIZE;
       this->Seek(page_offset, DB_SEEK_BEG, false);
       // Read one page.
       DbPage db_page;
       this->db_ptr_[0]->read(db_page.page_, DB_PAGE_SIZE);
       if (*(this->db_ptr_[0])) {
-        std::cout << "DSMgr: <" << __func__ << "> read page(" << incr_id << ") successfully !" << std::endl;
+        std::cout << "DSMgr: " << __func__ << " read page successfully, with logical_id[" \
+                  << incr_id << "] -> physical_id[" << p_id << "]" << std::endl;
       } else {
-        std::cerr << "DSMgr: <" << __func__ << "> error, only read " \
+        std::cerr << "DSMgr: " << __func__ << " error, only read " \
                   << this->db_ptr_[0]->gcount() << " bytes !" << std::endl;
       }
       // Push page into frame.
@@ -62,15 +65,19 @@ namespace ustc_dbms {
   bool DSMgr::WritePage(int frame_id, DbFrame& frame) {
     if (frame.dirty_) {
       for (auto page : frame.frame_) {
-        int page_id = page.first;
-        DbPage db_page = page.second;
-        int page_offset = page_id * DB_PAGE_SIZE;
+        int v_id = page.first;
+        auto [p_id, p_valid] = this->db_pcb_.V2PConvert(v_id);
+        assert(p_valid == true);
+        int page_offset = p_id * DB_PAGE_SIZE;
         this->Seek(page_offset, DB_SEEK_BEG, true);
+
+        DbPage db_page = page.second;
         this->db_ptr_[0]->write(db_page.page_, DB_PAGE_SIZE);
-        std::cout << "DSMgr: <" << __func__ << "> write page(" << page_id << ") successfully !" << std::endl;
+        std::cout << "DSMgr: " << __func__ << " write page successfully, with logical_id[" \
+                  << v_id << "] -> physical_id[" << p_id << "]" << std::endl;
       }
     } else {
-      std::cout << "DSMgr: <" << __func__ << "> frame(" << frame_id << ") dirty is false !" << std::endl;
+      std::cout << "DSMgr: " << __func__ << " frame[" << frame_id << "] dirty is false !" << std::endl;
     }
     return true;
   }

@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #define FRAMESIZE 4096
 #define DEFBUFSIZE  1024
@@ -43,6 +44,14 @@ struct DbFrame {
   std::vector<std::pair<int, DbPage>> frame_;
   bool dirty_;
 };    // struct DbFrame
+
+/*
+ * \brief Use for normally print.
+ */
+template <typename ... Args>
+void dbCout(Args&&... args) {
+  (std::cout << ... << args) << std::endl;
+}
 
 }   // namespace ustc_dbms
 
