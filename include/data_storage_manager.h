@@ -113,7 +113,8 @@ struct PCB {
     // Get a new v_id
     auto v_id = GetMaxVPage();
     v_id ++;
-    std::cout << "DSMgr: " << __func__ << " Increase page successfully, with logical_id[" << v_id << "] -> pyhsical_id[" << p_id << "]" << std::endl;
+    std::cout << "DSMgr: " << __FUNC__ << " logical_id[" << v_id 
+              << "] -> pyhsical_id[" << p_id << "]" << std::endl;
     // Insert [v_id,p_id] into v2p map.
     this->vp_cvt_.insert(std::make_pair(v_id, p_id));
     // Increase page num.

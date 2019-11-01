@@ -12,6 +12,8 @@
 #define DB_FRAME_NUM 4
 #define DB_PAGE_SIZE 4096
 
+#define __FUNC__ "_" << __func__ << "_L" << __LINE__ << "_"
+
 namespace ustc_dbms {
 
 struct DbPage {

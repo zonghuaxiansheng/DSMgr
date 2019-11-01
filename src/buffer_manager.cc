@@ -45,7 +45,8 @@ int BMgr::Hash(int page_id) {
 }
 int BMgr::FixPage(int page_id, int port) {
 
-  std::cout << "BMgr: " << __func__ << " page_id[" << page_id << "]" << std::endl;
+  std::cout << "BMgr: " << __FUNC__ 
+            << " page_id[" << page_id << "]" << std::endl;
 
   auto index = this->Hash(page_id);
   auto& fcb = this->db_bcb_->GetFcb(index);
@@ -104,7 +105,26 @@ int BMgr::FixPage(int page_id, int port) {
     } 
   }
 #else
-  std::cout << "BMgr: " << __func__ << " FixPage need call DSMgr to read page back !" << std::endl;
+  std::cout << "BMgr: " << __FUNC__ 
+            << " FixPage need call DSMgr to read page back !" << std::endl;
+  // Read page from DSMgr
+  auto db_frame = this->db_dsmgr_->ReadPage(page_id, 1);
+  // Replace FCB info
+  // TODO: Change prelace algorithm.
+  auto index = this->Hash(page_id);
+  auto& fcb = this->db_bcb_->GetFcb(index);
+  if (fcb.frame_status_ == FRAME_STATUS_E::DIRTY) {
+    /*
+     * \brief Frame is dirty now, need write back.
+     */
+  }
+  fcb.page_id_ = page_id;
+  fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
+  // Store page data into buffer
+  auto page_data = db_frame.frame_[0].second;
+  for (int i = 0; i < DB_PAGE_SIZE; i ++) {
+    this->db_buffer_[fcb.frame_id_*DB_PAGE_SIZE + i] = page_data.page_[i];
+  }
 #endif
   // this->WriteIntoPage(page_data, pindex);
   return index;

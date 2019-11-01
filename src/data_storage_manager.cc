@@ -19,7 +19,7 @@ namespace ustc_dbms {
     std::fstream *db_file = new std::fstream;
     db_file->open(file_name,std::ios::in|std::ios::out);
     if (!db_file->is_open()) {
-      std::cerr << "DSMgr: " << __func__ << " read/write db file failed !" << std::endl;
+      std::cerr << "DSMgr: " << __FUNC__ << " read/write db file failed !" << std::endl;
       return false;
     }
 
@@ -50,10 +50,10 @@ namespace ustc_dbms {
       DbPage db_page;
       this->db_ptr_[0]->read(db_page.page_, DB_PAGE_SIZE);
       if (*(this->db_ptr_[0])) {
-        std::cout << "DSMgr: " << __func__ << " read page successfully, with logical_id[" \
-                  << incr_id << "] -> physical_id[" << p_id << "]" << std::endl;
+        std::cout << "DSMgr: " << __FUNC__ << " logical_id[" << incr_id 
+                  << "] -> physical_id[" << p_id << "]" << std::endl;
       } else {
-        std::cerr << "DSMgr: " << __func__ << " error, only read " \
+        std::cerr << "DSMgr: " << __FUNC__ << " error, only read " \
                   << this->db_ptr_[0]->gcount() << " bytes !" << std::endl;
       }
       // Push page into frame.
@@ -73,11 +73,11 @@ namespace ustc_dbms {
 
         DbPage db_page = page.second;
         this->db_ptr_[0]->write(db_page.page_, DB_PAGE_SIZE);
-        std::cout << "DSMgr: " << __func__ << " write page successfully, with logical_id[" \
-                  << v_id << "] -> physical_id[" << p_id << "]" << std::endl;
+        std::cout << "DSMgr: " << __FUNC__ << " logical_id[" << v_id 
+                  << "] -> physical_id[" << p_id << "]" << std::endl;
       }
     } else {
-      std::cout << "DSMgr: " << __func__ << " frame[" << frame_id << "] dirty is false !" << std::endl;
+      std::cout << "DSMgr: " << __FUNC__ << " frame[" << frame_id << "] dirty is false !" << std::endl;
     }
     return true;
   }
@@ -97,7 +97,7 @@ namespace ustc_dbms {
           db_ptr->seekp(offset, std::ios::end);
           break;
         default:
-          std::cerr << "DSMgr: " << __func__ << " seek type error !" << std::endl;
+          std::cerr << "DSMgr: " << __FUNC__ << " seek type error !" << std::endl;
           break;
       }
     } else {
@@ -113,7 +113,7 @@ namespace ustc_dbms {
           db_ptr->seekg(offset, std::ios::end);
           break;
         default:
-          std::cerr << "DSMgr: " << __func__ << " seek type error !" << std::endl;
+          std::cerr << "DSMgr: " << __FUNC__ << " seek type error !" << std::endl;
           break;
       }      
     }
