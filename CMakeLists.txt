@@ -8,6 +8,7 @@ SET(BASE_DIR  ${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${BASE_DIR}/include)
 
 SET(BASE_SRC
+  ${BASE_DIR}/src/types.cc
   ${BASE_DIR}/src/buffer_manager.cc
   ${BASE_DIR}/src/data_storage_manager.cc
   )

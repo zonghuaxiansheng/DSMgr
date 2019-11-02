@@ -40,7 +40,7 @@ bool BMgr::InitBMgrTest(int test_size) {
     fcb.count_ = 0;
     fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
     fcb.clock_status_ = CLOCK_STATUS_E::FIRST;
-    dbCopy(page_data.page_, 0, fcb.dptr, 0, DB_PAGE_SIZE);
+    dbCopy(page_data.page_, 0, fcb.dptr_, 0, DB_PAGE_SIZE);
     // Put <page_id, frame_id> into HashBucket.
     this->hash_bucket_->Insert(std::make_pair(fcb.page_id_, fcb.frame_id_));
   }
@@ -72,7 +72,7 @@ int BMgr::FixPage(int page_id,
      * \brief Frame is dirty now, need write back.
      */
     DbPage db_page;
-    dbCopy(fcb.dptr, 0, db_page.page_, 0, DB_PAGE_SIZE);
+    dbCopy(fcb.dptr_, 0, db_page.page_, 0, DB_PAGE_SIZE);
     DbFrame db_frame;
     db_frame.frame_.push_back(std::make_pair(fcb.page_id_, db_page));
     db_frame.dirty_ = true;
@@ -83,7 +83,7 @@ int BMgr::FixPage(int page_id,
   fcb.count_ = 1;
   fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
   fcb.clock_status_ = CLOCK_STATUS_E::FIRST;
-  dbCopy(page_data.page_, 0, fcb.dptr, 0, DB_PAGE_SIZE);
+  dbCopy(page_data.page_, 0, fcb.dptr_, 0, DB_PAGE_SIZE);
   // Delete the bucket item which contains value=frame_id
   this->hash_bucket_->Delete(fcb.frame_id_);
   // Insert a new item into bucket.

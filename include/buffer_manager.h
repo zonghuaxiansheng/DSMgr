@@ -1,6 +1,7 @@
 #ifndef _USTC_BUFFER_MANAGER_H_
 #define _USTC_BUFFER_MANAGER_H_
 
+#include <map>
 #include "types.h"
 #include "data_storage_manager.h"
 
@@ -120,7 +121,7 @@ struct BCB {
      * \Step1. Search from current state to end state.
      * \Step2. Search from start state to current state.
      */
-    for (auto iter = this->clk_iter_; iter <= this->bcb_.end(); iter ++) {
+    for (auto iter = this->clk_iter_; iter != this->bcb_.end(); iter ++) {
       if (iter->clock_status_ == CLOCK_STATUS_E::LAST) {
         this->clk_iter_ = iter;
         this->IncrClk();
@@ -131,7 +132,7 @@ struct BCB {
         /* \brief This frame's count > 0 */
       }
     }
-    for (auto rter = this->bcb_.begin(); riter < this->clk_iter_; riter ++) {
+    for (auto riter = this->bcb_.begin(); riter != this->clk_iter_; riter ++) {
       if (riter->clock_status_ == CLOCK_STATUS_E::LAST) {
         this->clk_iter_ = riter;
         this->IncrClk();
@@ -237,9 +238,9 @@ struct HashBucket {
   inline auto isExist(int page_id) -> std::pair<int, bool> {
     auto index = this->Hash(page_id);
     auto& map_ = this->bucket_[index];
-    auto iter_ = map_.find(page_id);
+    auto iter = map_.find(page_id);
     if (iter != map_.end()) {
-      return std::make_pair(iter_->second, true);
+      return std::make_pair(iter->second, true);
     } else {
       return std::make_pair(0, false);
     }
@@ -258,7 +259,7 @@ struct HashBucket {
     auto index = this->frame_ptr_[frame_id];
     if (index >= 0) {
       auto& map_ = this->bucket_[index];
-      for (auto iter = map_.begin(); iter < map.end(); iter ++) {
+      for (auto iter = map_.begin(); iter != map_.end(); iter ++) {
         if (iter->second == frame_id) {
           map_.erase(iter);
           return true;
