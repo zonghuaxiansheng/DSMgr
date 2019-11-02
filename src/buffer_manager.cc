@@ -108,23 +108,29 @@ int BMgr::FixPage(int page_id, int port) {
   std::cout << "BMgr: " << __FUNC__ 
             << " FixPage need call DSMgr to read page back !" << std::endl;
   // Read page from DSMgr
-  auto db_frame = this->db_dsmgr_->ReadPage(page_id, 1);
+  auto rd_frame = this->db_dsmgr_->ReadPage(page_id, 1);
   // Replace FCB info
   // TODO: Change prelace algorithm.
-  auto index = this->Hash(page_id);
-  auto& fcb = this->db_bcb_->GetFcb(index);
   if (fcb.frame_status_ == FRAME_STATUS_E::DIRTY) {
     /*
      * \brief Frame is dirty now, need write back.
      */
+    DbPage db_page;
+    int src_offset = fcb.frame_id_*DB_PAGE_SIZE;
+    int dst_offset = 0;
+    dbCopy(this->db_buffer_, src_offset, db_page.page_, dst_offset, DB_PAGE_SIZE);
+    DbFrame db_frame;
+    db_frame.frame_.push_back(std::make_pair(fcb.page_id_, db_page));
+    db_frame.dirty_ = true;
+    this->db_dsmgr_->WritePage(0, db_frame);
   }
   fcb.page_id_ = page_id;
   fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
   // Store page data into buffer
-  auto page_data = db_frame.frame_[0].second;
-  for (int i = 0; i < DB_PAGE_SIZE; i ++) {
-    this->db_buffer_[fcb.frame_id_*DB_PAGE_SIZE + i] = page_data.page_[i];
-  }
+  auto rd_page = rd_frame.frame_[0].second;
+  int src_offset = 0;
+  int dst_offset = fcb.frame_id_*DB_PAGE_SIZE;
+  dbCopy(rd_page.page_, src_offset, this->db_buffer_, dst_offset, DB_PAGE_SIZE);
 #endif
   // this->WriteIntoPage(page_data, pindex);
   return index;
