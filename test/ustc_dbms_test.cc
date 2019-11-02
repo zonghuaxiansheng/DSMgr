@@ -9,6 +9,11 @@ int main(void) {
   bmgr.InitBMgrTest(100);
   bmgr.FixPage(6, 0);
   bmgr.FixPage(20, 0);
+  auto [page_id, frame_id] = bmgr.FixNewPage();
+  std::cout << "Test: " << __FUNC__
+            << " FixNewPage return with page_id[" << page_id
+            << "] frame_id[" << frame_id << "]"
+            << std::endl;
   // ...
   std::cout << "***********************USTC DBMS TEST***********************" << std::endl;
   

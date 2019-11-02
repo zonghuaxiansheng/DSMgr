@@ -55,6 +55,9 @@ void dbCout(Args&&... args) {
   (std::cout << ... << args) << std::endl;
 }
 
+/*
+ * \brief Use for buffer data copy.
+ */
 void dbCopy(char* src_data,
             int src_offset,
             char* dst_data,
