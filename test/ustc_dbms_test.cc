@@ -2,6 +2,18 @@
 // #include "data_storage_manager.h"
 #include <iostream>
 
+bool runBMgrTraceTest(ustc_dbms::BMgr& bmgr,
+                      std::string& trace_path) {
+  std::fstream trace_;
+  trace_.open(trace_path, std::ios::in);
+  if (!trace_.is_open()) {
+    std::cerr << "Test: " << __FUNC__
+              << " Read trace file failed !"
+              << std::endl;
+    return false;
+  }
+}
+
 int main(void) {
 
   int buffer_size = 128;
@@ -13,8 +25,6 @@ int main(void) {
                        bucket_size,
                        db_path);
   bmgr.InitBMgrTest(1024);
-  // bmgr.FixPage(6, 0);
-  // bmgr.FixPage(20, 0);
   for (int i = 1; i < 100; i ++) {
     bmgr.FixPage(i, 0);
   }
@@ -29,7 +39,6 @@ int main(void) {
             << " FixNewPage return with page_id[" << page_id
             << "] frame_id[" << frame_id << "]"
             << std::endl;
-  // ...
   std::cout << "***********************USTC DBMS TEST***********************" << std::endl;
   
   return 0;
