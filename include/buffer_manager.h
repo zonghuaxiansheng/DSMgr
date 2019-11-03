@@ -350,7 +350,8 @@ class BMgr {
   public:
     BMgr(int bsize=1024,
          int hsize=128,
-         std::string db_path="out/default.db");
+         std::string db_path="out/default.db",
+         bool is_build);
     ~BMgr();
 
     bool InitBMgrTest(int test_size);

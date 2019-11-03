@@ -3,7 +3,8 @@
 namespace ustc_dbms {
 BMgr::BMgr(int bsize,
            int hsize,
-           std::string db_path) {
+           std::string db_path,
+           bool is_build) {
   std::cout << "BMgr: " << "Start Buffer Manager ..." << std::endl;
   // Initial buffer size
   this->buffer_size_ = bsize;
@@ -15,7 +16,7 @@ BMgr::BMgr(int bsize,
   this->hash_bucket_->InitBucket(hsize, bsize);
   // Initial DSMgr
   // std::string db_path = "./out/default.db";
-  this->db_dsmgr_ = new DSMgr(db_path);
+  this->db_dsmgr_ = new DSMgr(db_path, is_build);
 }
 BMgr::~BMgr() {
   // Release the memory space which buffer has allocated.

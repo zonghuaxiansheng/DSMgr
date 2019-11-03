@@ -83,6 +83,15 @@ void dbCopy(char* src_data,
             int copy_size);
 
 }   // namespace ustc_dbms
-
+/*
+ * \brief Convert int to char.
+ */
+void Int2Char(int in,
+              char* out);
+/*
+ * \brief Convert char to int.
+ */
+void Char2Int(char* in,
+              int& out);
 
 #endif

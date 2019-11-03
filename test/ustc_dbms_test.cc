@@ -68,6 +68,7 @@ int main(void) {
 
   int buffer_size = 1024;
   int bucket_size = 16;
+  bool is_build = true;
   std::string db_path("out/data.dbf");
   std::string trace_path("data/data-5w-50w-zipf.txt");
   // std::string trace_path("data/db-data-gen.txt");
@@ -75,9 +76,10 @@ int main(void) {
   std::cout << "***********************USTC DBMS TEST***********************" << std::endl;
   ustc_dbms::BMgr bmgr(buffer_size,
                        bucket_size,
-                       db_path);
+                       db_path,
+                       is_build);
   // Run BMgr trace test
-   RunBMgrTraceTest(bmgr, trace_path);
+  // RunBMgrTraceTest(bmgr, trace_path);
 
   // bmgr.InitBMgrTest(1024);
   // for (int i = 1; i < 100; i ++) {

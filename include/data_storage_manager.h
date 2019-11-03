@@ -2,6 +2,7 @@
 #define _USTC_DATA_STORAGE_MANAGER_H_
 
 #include "string.h"
+#include "math.h"
 #include "types.h"
 #include <iostream>
 #include <fstream>
@@ -134,7 +135,8 @@ class DSMgr {
     /* \brief Write cnt. */
     int w_cnt_;
   public:
-    DSMgr(std::string db_path="./out/default.db");
+    DSMgr(std::string db_path="./out/default.db",
+          bool is_build=true);
     ~DSMgr();
     /*
      * \brief Functoins of db file operation.
