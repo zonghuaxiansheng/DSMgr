@@ -30,25 +30,33 @@ BMgr::~BMgr() {
 }
 bool BMgr::InitBMgrTest(int test_size) {
   for (int i = 0; i < test_size; i ++) {
-    // New one page, then load page data.
-    auto page_id = this->db_dsmgr_->NewPage();
-    auto rd_frame = this->db_dsmgr_->ReadPage(page_id, 1);
-    auto& page_data = rd_frame.frame_[0].second;
-    // Get one frame from BCB, then put info & data into frame.
-    auto& fcb = this->db_bcb_->PickFcbOut();
-    fcb.page_id_ = page_id;
-    fcb.count_ = 0;
-    fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
-    fcb.clock_status_ = CLOCK_STATUS_E::FIRST;
-    dbCopy(page_data.page_, 0, fcb.dptr_, 0, DB_PAGE_SIZE);
-    // Put <page_id, frame_id> into HashBucket.
-    this->hash_bucket_->Insert(std::make_pair(fcb.page_id_, fcb.frame_id_));
+    auto [page_id, frame_id] = this->FixNewPage();
+    __HPRINT__({
+    std::cout << "BMgr: " << __FUNC__
+              << " FixNewPage with page_id[" << page_id
+              << "] -> frame_id[" << frame_id << "]"
+              << std::endl;
+    })
+    this->UnfixPage(page_id);
+    // // New one page, then load page data.
+    // auto page_id = this->db_dsmgr_->NewPage();
+    // auto rd_frame = this->db_dsmgr_->ReadPage(page_id, 1);
+    // auto& page_data = rd_frame.frame_[0].second;
+    // // Get one frame from BCB, then put info & data into frame.
+    // auto& fcb = this->db_bcb_->PickFcbOut();
+    // fcb.page_id_ = page_id;
+    // fcb.count_ = 0;
+    // fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
+    // fcb.clock_status_ = CLOCK_STATUS_E::FIRST;
+    // dbCopy(page_data.page_, 0, fcb.dptr_, 0, DB_PAGE_SIZE);
+    // // Put <page_id, frame_id> into HashBucket.
+    // this->hash_bucket_->Insert(std::make_pair(fcb.page_id_, fcb.frame_id_));
   }
   this->db_dsmgr_->PrintIO();
   this->db_dsmgr_->ResetIO();
 }
 int BMgr::WritePage(int page_id) {
-  __HPRINT__({
+  __MPRINT__({
   std::cout << "BMgr: " << __FUNC__ 
             << " Write page_id[" << page_id << "]" 
             << std::endl;
@@ -98,7 +106,7 @@ int BMgr::WritePage(int page_id) {
 }
 int BMgr::FixPage(int page_id,
                   int prot) {
-  __HPRINT__({
+  __MPRINT__({
   std::cout << "BMgr: " << __FUNC__ 
             << " Fix page_id[" << page_id << "]" 
             << std::endl;
@@ -225,5 +233,8 @@ void BMgr::PrintFrame(int frame_id) {
             << "* count: " << fcb.count_ << std::endl
             << "* frame_status: " << fcb.frame_status_ << std::endl
             << "* clock_status: " << fcb.clock_status_ << std::endl;
+}
+void BMgr::PrintIO() {
+  this->db_dsmgr_->PrintIO();
 }
 }

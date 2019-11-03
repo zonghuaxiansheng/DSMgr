@@ -14,7 +14,7 @@
 
 #define __FUNC__ "_" << __func__ << "_L" << __LINE__ << "_"
 
-#ifdef HGIH_PRINT
+#ifdef HIGH_PRINT
   #define PRINT_LEVEL 0
 #else
 #ifdef MEDIUM_PRINT
@@ -28,9 +28,9 @@
 #endif
 #endif
 
-#define __HPRINT__(x) if (PRINT_LEVEL >= 0) {x}
-#define __MPRINT__(x) if (PRINT_LEVEL >= 1) {x}
-#define __LPRINT__(x) if (PRINT_LEVEL >= 2) {x}
+#define __HPRINT__(x) if (PRINT_LEVEL <= 0) {x}
+#define __MPRINT__(x) if (PRINT_LEVEL <= 1) {x}
+#define __LPRINT__(x) if (PRINT_LEVEL <= 2) {x}
 
 namespace ustc_dbms {
 

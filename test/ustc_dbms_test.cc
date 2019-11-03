@@ -8,7 +8,7 @@ struct OPS {
   int page_id_;
 };
 
-bool runBMgrTraceTest(ustc_dbms::BMgr& bmgr,
+bool RunBMgrTraceTest(ustc_dbms::BMgr& bmgr,
                       std::string& trace_path) {
   std::fstream trace;
   trace.open(trace_path, std::ios::in);
@@ -36,46 +36,62 @@ bool runBMgrTraceTest(ustc_dbms::BMgr& bmgr,
       max_page_id = ops.page_id_;
     }
   }
+  max_page_id ++;
   std::cout << "Test: " << __FUNC__
-            << " Max page id is " << max_page_id
-            << std::endl;
+            << " Max page id is " << max_page_id << std::endl;
   // Initial BMgr
+  std::cout << "Test: " << __FUNC__
+            << " Build db file ..." << std::endl;
   bmgr.InitBMgrTest(max_page_id);
+  std::cout << "Test: " << __FUNC__
+            << " Build done ..." << std::endl;
   // Run test
   for (auto ops : ops_vec) {
     switch (ops.ops_e_) {
       case R :
         bmgr.FixPage(ops.page_id_, 0);
+        bmgr.UnfixPage(ops.page_id_);
         break;
       case W :
-        std::cout << "" << std::endl;
+        bmgr.WritePage(ops.page_id_);
+        break;
+      default :
+        std::cout << "WTF ?" << std::endl;
+        break;
     }
   }
+  bmgr.WriteDirtys();
+  bmgr.PrintIO();
 }
 
 int main(void) {
 
-  int buffer_size = 128;
+  int buffer_size = 1024;
   int bucket_size = 16;
-  std::string db_path("out/ustc.db");
+  std::string db_path("out/data.dbf");
   std::string trace_path("data/data-5w-50w-zipf.txt");
+  // std::string trace_path("data/db-data-gen.txt");
 
   std::cout << "***********************USTC DBMS TEST***********************" << std::endl;
   ustc_dbms::BMgr bmgr(buffer_size,
                        bucket_size,
                        db_path);
   // Run BMgr trace test
-  runBMgrTraceTest(bmgr, trace_path);
+   RunBMgrTraceTest(bmgr, trace_path);
+
   // bmgr.InitBMgrTest(1024);
   // for (int i = 1; i < 100; i ++) {
   //   bmgr.FixPage(i, 0);
   // }
+  // bmgr.WritePage(20);
+  // bmgr.WritePage(30);
   // bmgr.SetDirty(10);
   // bmgr.SetDirty(20);
   // bmgr.PrintFrame(10);
   // bmgr.SetClean(10);
   // bmgr.PrintFrame(10);
   // bmgr.WriteDirtys();
+  // bmgr.PrintIO();
   // auto [page_id, frame_id] = bmgr.FixNewPage();
   // std::cout << "Test: " << __FUNC__
   //           << " FixNewPage return with page_id[" << page_id

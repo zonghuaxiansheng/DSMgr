@@ -303,10 +303,12 @@ struct HashBucket {
         }
       } 
     }
-    std::cerr << "BMgr: " << __FUNC__
+    __MPRINT__({
+    std::cout << "BMgr: " << __FUNC__
               << " Delete bucket item failed with (frame_id,index)[" 
               << frame_id << "," << index << "] !"
               << std::endl;
+    })
     return false;
   }
   // Print
@@ -359,6 +361,7 @@ class BMgr {
     int UnfixPage(int page_id);
     int WritePage(int page_id);
     int NumFreeFrames();
+    void PrintIO();
     // Internal Functions
     // int SelectVictim();
     // void RemoveBCB(BCB * ptr, int page_id);

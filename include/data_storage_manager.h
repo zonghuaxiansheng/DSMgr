@@ -103,7 +103,9 @@ struct PCB {
     SetBitMap(p_id, 0);
     // Get a new v_id
     auto v_id = GetMaxVPage();
-    v_id ++;
+    if (v_id > 0 || p_id > 0) {
+      v_id ++;
+    }
     __MPRINT__({
     std::cout << "DSMgr: " << __FUNC__ 
               << " logical_id[" << v_id 
