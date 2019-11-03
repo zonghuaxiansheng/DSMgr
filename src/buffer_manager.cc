@@ -45,6 +45,7 @@ bool BMgr::InitBMgrTest(int test_size) {
     this->hash_bucket_->Insert(std::make_pair(fcb.page_id_, fcb.frame_id_));
   }
 }
+int BMgr::WritePage(int page_id) {}
 int BMgr::FixPage(int page_id,
                   int prot) {
   std::cout << "BMgr: " << __FUNC__ 
