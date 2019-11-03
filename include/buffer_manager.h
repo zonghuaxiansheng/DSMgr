@@ -82,9 +82,11 @@ struct BCB {
     if (bsize > 0) {
       this->SetBufferSize(bsize);
     } else {
+      __HPRINT__({
       std::cout << "BMgr: " << __FUNC__ 
                 << " Forget set buffer_size_ ? buffer_size_ will be old value("
                 << this->buffer_size_ << ") !" << std::endl;
+      })
     }
     // Initial BCB
     this->bcb_.clear();
@@ -124,37 +126,51 @@ struct BCB {
      * \Step1. Search from current state to end state.
      * \Step2. Search from start state to current state.
      */
+    __MPRINT__({
     std::cout << "BMgr: " << __FUNC__
               << " Clock scheduling start !"
               << std::endl;
+    })
     int loop_cnt = 0;
     while (true) {
       for (auto iter = this->clk_iter_; iter != this->bcb_.end(); iter ++) {
         if (iter->clock_status_ == CLOCK_STATUS_E::LAST) {
+          __MPRINT__({
           std::cout << "<Last>[" << iter->frame_id_ << "] " << std::endl;
+          })
           this->clk_iter_ = iter;
           this->IncrClk();
           return *iter;
         } else if (iter->count_ == 0) {
           iter->clock_status_ = CLOCK_STATUS_E::LAST;
+          __MPRINT__({
           std::cout << "<First>[" << iter->frame_id_ << "] ";
+          })
         } else {
           /* \brief This frame's count > 0 */
+          __MPRINT__({
           std::cout << "<Skip>[" << iter->frame_id_ << "] ";
+          })
         }
       }
       for (auto riter = this->bcb_.begin(); riter != this->clk_iter_; riter ++) {
         if (riter->clock_status_ == CLOCK_STATUS_E::LAST) {
+          __MPRINT__({
           std::cout << "<Last>[" << riter->frame_id_ << "] " << std::endl;
+          })
           this->clk_iter_ = riter;
           this->IncrClk();
           return *riter;
         } else if (riter->count_ == 0) {
           riter->clock_status_ = CLOCK_STATUS_E::LAST;
+          __MPRINT__({
           std::cout << "<First>[" << riter->frame_id_ << "] ";
+          })
         } else {
           /* \brief This frame's count > 0 */
+          __MPRINT__({
           std::cout << "<Skip>[" << riter->frame_id_ << "] ";
+          })
         }
       }
       loop_cnt ++;
@@ -231,9 +247,11 @@ struct HashBucket {
     if (bsize > 0) {
       this->bucket_size_ = bsize;
     } else {
+      __HPRINT__({
       std::cout << "BMgr: " << __FUNC__
                 << " Forget set bucket_size_ ? bucket_size_ will be old value("
                 << this->bucket_size_ << ") !" << std::endl;
+      })
     }
     this->bucket_.clear();
     for (int i = 0; i < this->bucket_size_; i ++) {

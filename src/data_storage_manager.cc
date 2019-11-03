@@ -4,6 +4,7 @@ namespace ustc_dbms {
 
   DSMgr::DSMgr(std::string db_path) {
     std::cout << "DSMgr: " << "Start Data Storage Manager ..." << std::endl;
+    this->ResetIO();
     this->OpenDbFile(db_path);
   }
 
@@ -51,10 +52,13 @@ namespace ustc_dbms {
       // Read one page.
       DbPage db_page;
       this->db_ptr_[0]->read(db_page.page_, DB_PAGE_SIZE);
+      this->IncrICnt();
       if (*(this->db_ptr_[0])) {
+        __MPRINT__({
         std::cout << "DSMgr: " << __FUNC__
                   << " logical_id[" << incr_id << "] -> physical_id[" << p_id << "]"
                   << std::endl;
+        })
       } else {
         std::cerr << "DSMgr: " << __FUNC__
                   << " error, only read " << this->db_ptr_[0]->gcount() << " bytes !"
@@ -77,9 +81,12 @@ namespace ustc_dbms {
 
         DbPage db_page = page.second;
         this->db_ptr_[0]->write(db_page.page_, DB_PAGE_SIZE);
+        this->IncrOCnt();
+        __MPRINT__({
         std::cout << "DSMgr: " << __FUNC__
                   << " logical_id[" << v_id << "] -> physical_id[" << p_id << "]"
                   << std::endl;
+        })
       }
     } else {
       std::cout << "DSMgr: " << __FUNC__

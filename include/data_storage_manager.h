@@ -8,8 +8,6 @@
 #include <string>
 #include <map>
 
-#define CHECK(x,y) if(!x) std::cout << "CHECK_FAIL: " << y << std::endl;
-
 namespace ustc_dbms {
 
 typedef unsigned char uint8_t;
@@ -106,8 +104,11 @@ struct PCB {
     // Get a new v_id
     auto v_id = GetMaxVPage();
     v_id ++;
-    std::cout << "DSMgr: " << __FUNC__ << " logical_id[" << v_id 
+    __MPRINT__({
+    std::cout << "DSMgr: " << __FUNC__ 
+              << " logical_id[" << v_id 
               << "] -> pyhsical_id[" << p_id << "]" << std::endl;
+    })
     // Insert [v_id,p_id] into v2p map.
     this->vp_cvt_.insert(std::make_pair(v_id, p_id));
     // Increase page num.
@@ -126,6 +127,10 @@ class DSMgr {
      * \brief A structure of db_file's handle.
      */
     std::vector<std::fstream *> db_ptr_;
+    /* \brief Read cnt. */
+    int r_cnt_;
+    /* \brief Write cnt. */
+    int w_cnt_;
   public:
     DSMgr(std::string db_path="./out/default.db");
     ~DSMgr();
@@ -159,6 +164,23 @@ class DSMgr {
     int GetPageNum() {
       auto page_num = this->db_pcb_.GetPageNum();
       return page_num;
+    }
+    void ResetIO() {
+      this->r_cnt_ = 0;
+      this->w_cnt_ = 0;
+    }
+    void IncrICnt() {
+      this->r_cnt_ ++;
+    }
+    void IncrOCnt() {
+      this->w_cnt_ ++;
+    }
+    void PrintIO() {
+      std::cout << "DSMgr: " << __FUNC__
+                << std::endl
+                << "* IO Details: <I>[" << this->r_cnt_ << "] <O>["
+                << this->w_cnt_ << "] <Total>[" << (this->r_cnt_ + this->w_cnt_) << "]"
+                << std::endl;
     }
     /*
      * \brief Release the db_handle's memory space.

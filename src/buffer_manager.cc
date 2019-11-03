@@ -44,6 +44,8 @@ bool BMgr::InitBMgrTest(int test_size) {
     // Put <page_id, frame_id> into HashBucket.
     this->hash_bucket_->Insert(std::make_pair(fcb.page_id_, fcb.frame_id_));
   }
+  this->db_dsmgr_->PrintIO();
+  this->db_dsmgr_->ResetIO();
 }
 int BMgr::WritePage(int page_id) {
   __HPRINT__({
@@ -138,7 +140,7 @@ int BMgr::FixPage(int page_id,
   fcb.clock_status_ = CLOCK_STATUS_E::FIRST;
   dbCopy(page_data.page_, 0, fcb.dptr_, 0, DB_PAGE_SIZE);
   // Debug
-  this->hash_bucket_->Print();
+  // this->hash_bucket_->Print();
   // Delete the bucket item which contains value=frame_id
   this->hash_bucket_->Delete(fcb.frame_id_);
   // Insert a new item into bucket.
