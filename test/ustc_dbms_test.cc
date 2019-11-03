@@ -9,7 +9,8 @@ struct OPS {
 };
 
 bool RunBMgrTraceTest(ustc_dbms::BMgr& bmgr,
-                      std::string& trace_path) {
+                      std::string& trace_path,
+                      bool is_run) {
   std::fstream trace;
   trace.open(trace_path, std::ios::in);
   if (!trace.is_open()) {
@@ -36,39 +37,49 @@ bool RunBMgrTraceTest(ustc_dbms::BMgr& bmgr,
       max_page_id = ops.page_id_;
     }
   }
-  max_page_id ++;
-  std::cout << "Test: " << __FUNC__
-            << " Max page id is " << max_page_id << std::endl;
-  // Initial BMgr
-  std::cout << "Test: " << __FUNC__
-            << " Build db file ..." << std::endl;
-  bmgr.InitBMgrTest(max_page_id);
-  std::cout << "Test: " << __FUNC__
-            << " Build done ..." << std::endl;
-  // Run test
-  for (auto ops : ops_vec) {
-    switch (ops.ops_e_) {
-      case R :
-        bmgr.FixPage(ops.page_id_, 0);
-        bmgr.UnfixPage(ops.page_id_);
-        break;
-      case W :
-        bmgr.WritePage(ops.page_id_);
-        break;
-      default :
-        std::cout << "WTF ?" << std::endl;
-        break;
+  if (!is_run) {
+    max_page_id ++;
+    std::cout << "Test: " << __FUNC__
+              << " Max page id is " << max_page_id << std::endl;
+    // Initial BMgr
+    std::cout << "Test: " << __FUNC__
+              << " Build db file ..." << std::endl;
+    bmgr.InitBMgrTest(max_page_id);
+    std::cout << "Test: " << __FUNC__
+              << " Build done ..." << std::endl;
+  } else {
+    std::cout << "Test: " << __FUNC__
+              << " Trace test start ..."
+              << std::endl;
+    // Run test
+    for (auto ops : ops_vec) {
+      switch (ops.ops_e_) {
+        case R :
+          bmgr.FixPage(ops.page_id_, 0);
+          bmgr.UnfixPage(ops.page_id_);
+          break;
+        case W :
+          bmgr.WritePage(ops.page_id_);
+          break;
+        default :
+          std::cout << "WTF ?" << std::endl;
+          break;
+      }
     }
+    bmgr.WriteDirtys();
+    std::cout << "Test: " << __FUNC__
+              << " Trace test done ..."
+              << std::endl;
+    bmgr.PrintIO();
   }
-  bmgr.WriteDirtys();
-  bmgr.PrintIO();
+  return true;
 }
 
 int main(void) {
 
   int buffer_size = 1024;
-  int bucket_size = 16;
-  bool is_build = true;
+  int bucket_size = 32;
+  bool is_build = false;
   std::string db_path("out/data.dbf");
   std::string trace_path("data/data-5w-50w-zipf.txt");
   // std::string trace_path("data/db-data-gen.txt");
@@ -79,9 +90,9 @@ int main(void) {
                        db_path,
                        is_build);
   // Run BMgr trace test
-  // RunBMgrTraceTest(bmgr, trace_path);
+  RunBMgrTraceTest(bmgr, trace_path, ~is_build);
 
-  // bmgr.InitBMgrTest(1024);
+  // bmgr.InitBMgrTest(1000);
   // for (int i = 1; i < 100; i ++) {
   //   bmgr.FixPage(i, 0);
   // }

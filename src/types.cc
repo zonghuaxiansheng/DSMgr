@@ -16,17 +16,19 @@ void dbCopy(char* src_data,
 /*
  * \brief Convert int to char.
  */
-void Int2Char(int in, char* out) {
-  for (int i = 3; i >= 0; i ++) {
+void Int2Char(int in,
+              uint8_t* out) {
+  for (int i = 3; i >= 0; i --) {
     *(out + i) = (uint8_t)(in >> ((3 - i)*8));
   }
 }
 /*
  * \brief Convert char to int.
  */
-void Char2Int(char* in, int& out) {
+void Char2Int(uint8_t* in,
+              int& out) {
   out = 0;
-  for (int i = 3; i >= 0; i ++) {
+  for (int i = 3; i >= 0; i --) {
     int tmp = (int)*(in + i);
     tmp = (tmp & 0xff) << ((3 - i)*8);
     out |= tmp;

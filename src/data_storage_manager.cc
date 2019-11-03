@@ -140,8 +140,13 @@ std::fstream * DSMgr::GetFile() {
   }
 }
 void DSMgr::Pcb2Bytes() {
+  __LPRINT__({
+  std::cout << "DSMgr: " << __FUNC__
+            << " Store meta data to database ..."
+            << std::endl;
+  })
   int page_num = this->db_pcb_.bit_map_.size();
-  int bit_map_num = ceil(page_num*sizeof(uint8_t) / (DB_PAGE_SIZE + 0.0));
+  int bit_map_num = ceil(page_num*sizeof(int) / (DB_PAGE_SIZE + 0.0));
   int vp_cvt_num = ceil(page_num*sizeof(int)*2 / (DB_PAGE_SIZE + 0.0));
 
   int meta_block_num = bit_map_num + vp_cvt_num;
@@ -150,10 +155,12 @@ void DSMgr::Pcb2Bytes() {
   uint8_t* bit_meta_block = new uint8_t[bit_map_num*DB_PAGE_SIZE*sizeof(uint8_t)];
   uint8_t* vp_meta_block = new uint8_t[vp_cvt_num*DB_PAGE_SIZE*sizeof(uint8_t)];
   uint8_t* head_meta_block = new uint8_t[DB_PAGE_SIZE*sizeof(uint8_t)];
-  for (int i = 0; i < page_num; i ++) {
-    bit_meta_block[i] = this->db_pcb_.bit_map_[i];
-  }
   int offset = 0;
+  for (int i = 0; i < page_num; i ++) {
+    Int2Char(this->db_pcb_.bit_map_[i], bit_meta_block + offset);
+    offset += 4;
+  }
+  offset = 0;
   for (auto& vp : this->db_pcb_.vp_cvt_) {
     int v_id = vp.first;
     int p_id = vp.second;
@@ -170,18 +177,29 @@ void DSMgr::Pcb2Bytes() {
   Int2Char(page_num, head_meta_block + offset);
 
   this->Seek(0, DB_SEEK_E::DB_SEEK_END, true);
-  this->db_ptr_[0]->write(bit_meta_block, bit_map_num*DB_PAGE_SIZE);
-  this->db_ptr_[0]->write(vp_meta_block, vp_cvt_num*DB_PAGE_SIZE);
-  this->db_ptr_[0]->write(head_meta_block, DB_PAGE_SIZE);
+  this->db_ptr_[0]->write((char*)bit_meta_block, bit_map_num*DB_PAGE_SIZE);
+  this->db_ptr_[0]->write((char*)vp_meta_block, vp_cvt_num*DB_PAGE_SIZE);
+  this->db_ptr_[0]->write((char*)head_meta_block, DB_PAGE_SIZE);
+
+  __LPRINT__({
+  std::cout << "DSMgr: " << __FUNC__
+            << " Store done ..."
+            << std::endl;
+  })
 
   delete bit_meta_block;
   delete vp_meta_block;
   delete head_meta_block;
 }
 void DSMgr::Bytes2Pcb() {
+  __LPRINT__({
+  std::cout << "DSMgr: " << __FUNC__
+            << " Load meta data from database..."
+            << std::endl;
+  })
   this->Seek(-DB_PAGE_SIZE, DB_SEEK_E::DB_SEEK_END, false);
   uint8_t* head_meta_block = new uint8_t[DB_PAGE_SIZE*sizeof(uint8_t)];
-  this->db_ptr_[0].read(head_meta_block, DB_PAGE_SIZE);
+  this->db_ptr_[0]->read((char*)head_meta_block, DB_PAGE_SIZE);
 
   int offset = 0;
   int meta_block_num;
@@ -193,20 +211,21 @@ void DSMgr::Bytes2Pcb() {
   offset += 4;
   Char2Int(head_meta_block + offset, page_num);
 
-  int bit_map_num = ceil(page_num*sizeof(uint8_t) / (DB_PAGE_SIZE + 0.0));
+  int bit_map_num = ceil(page_num*sizeof(int) / (DB_PAGE_SIZE + 0.0));
   int vp_cvt_num = ceil(page_num*sizeof(int)*2 / (DB_PAGE_SIZE + 0.0));
 
   uint8_t* bit_meta_block = new uint8_t[bit_map_num*DB_PAGE_SIZE*sizeof(uint8_t)];
   uint8_t* vp_meta_block = new uint8_t[vp_cvt_num*DB_PAGE_SIZE*sizeof(uint8_t)];
-  uint8_t* head_meta_block = new uint8_t[DB_PAGE_SIZE*sizeof(uint8_t)];
 
   this->Seek(-(bit_map_num + vp_cvt_num + 1)*DB_PAGE_SIZE, DB_SEEK_E::DB_SEEK_END, false);
-  this->db_ptr_[0]->read(bit_meta_block, bit_map_num*DB_PAGE_SIZE);
-  this->db_ptr_[0]->read(vp_meta_block, vp_cvt_num*DB_PAGE_SIZE);
+  this->db_ptr_[0]->read((char*)bit_meta_block, bit_map_num*DB_PAGE_SIZE);
+  this->db_ptr_[0]->read((char*)vp_meta_block, vp_cvt_num*DB_PAGE_SIZE);
   
   this->db_pcb_.bit_map_.clear();
   for (int i = 0; i < page_num; i ++) {
-    this->db_pcb_.bit_map_.push_back(bit_meta_block[i]);
+    int tmp;
+    Char2Int(bit_meta_block + i*sizeof(int), tmp);
+    this->db_pcb_.bit_map_.push_back(tmp);
   }
   this->db_pcb_.vp_cvt_.clear();
   for (int i = 0; i < page_num; i ++) {
@@ -214,8 +233,14 @@ void DSMgr::Bytes2Pcb() {
     int p_id;
     Char2Int(vp_meta_block + i*sizeof(int)*2, v_id);
     Char2Int(vp_meta_block + i*sizeof(int)*2 + 4, p_id);
-    this->db_pcb_.insert(std::make_pair(v_id, p_id));
+    this->db_pcb_.vp_cvt_.insert(std::make_pair(v_id, p_id));
   }
+
+  __LPRINT__({
+  std::cout << "DSMgr: " << __FUNC__
+            << " Load done ..."
+            << std::endl;
+  })
   
   delete bit_meta_block;
   delete vp_meta_block;

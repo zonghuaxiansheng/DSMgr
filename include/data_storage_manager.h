@@ -17,7 +17,7 @@ enum DB_SEEK_E {DB_SEEK_BEG, DB_SEEK_CUR, DB_SEEK_END};
 
 struct PCB {
   /* \brief A bit map for all pages.Valid is 1, invalid is 0. */
-  std::vector<uint8_t> bit_map_;
+  std::vector<int> bit_map_;
   /* \brief Virtual page to physical page convert. */
   std::map<int, int> vp_cvt_;
   /* \brief Page num. */
@@ -68,12 +68,12 @@ struct PCB {
   }
   // NewOnePage
   int NewOnePage() {
-    this->bit_map_.push_back((uint8_t)1);
+    this->bit_map_.push_back(1);
     auto new_p_id = this->bit_map_.size() - 1;
     return new_p_id;
   }
   // SetBitMap
-  int SetBitMap(const int index, const uint8_t value) {
+  int SetBitMap(const int index, const int value) {
     assert(this->bit_map_.size() > index);
     this->bit_map_[index] = value;
   }
@@ -84,7 +84,7 @@ struct PCB {
     assert(p_valid);
     assert(this->bit_map_.size() > p_id);
     // Set page as valid.
-    this->bit_map_[p_id] = (uint8_t)1;
+    this->bit_map_[p_id] = 1;
     // Delete the (v_id -> p_id)'s relationship.
     auto eret = this->vp_cvt_.erase(v_id);
     assert(eret);
@@ -147,6 +147,8 @@ class DSMgr {
     bool WritePage(int frame_id, DbFrame& frame);
     void Seek(int offset, DB_SEEK_E pos, int is_put);
     std::fstream * GetFile();
+    void Pcb2Bytes();
+    void Bytes2Pcb();
     /*
      * \brief Functions of PCB operation.
      */
