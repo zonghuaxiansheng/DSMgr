@@ -155,8 +155,9 @@ void BMgr::WriteDirtys() {
 void BMgr::PrintFrame(int frame_id) {
   auto& fcb = this->db_bcb_->GetFcb(frame_id);
   std::cout << "BMgr: " << __FUNC__
-            << "*-Frame Info-" << std::endl;
-            << "* frame_id: " << fcb.frame_id_ << std::endl
+            << " * * * * Frame * * * *"
+            << std::endl;
+  std::cout << "* frame_id: " << fcb.frame_id_ << std::endl
             << "* page_id: " << fcb.page_id_ << std::endl
             << "* count: " << fcb.count_ << std::endl
             << "* frame_status: " << fcb.frame_status_ << std::endl

@@ -106,7 +106,7 @@ struct BCB {
       // bcb_iter.dptr_ = nullptr;
     }
   }
-  inline auto& GetBcb() -> std::vector<FCB> {
+  inline auto& GetBcb() {
     return this->bcb_;
   }
   // IncrClk
