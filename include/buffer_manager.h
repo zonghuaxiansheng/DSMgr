@@ -140,16 +140,16 @@ struct BCB {
     }
     for (auto riter = this->bcb_.begin(); riter != this->clk_iter_; riter ++) {
       if (riter->clock_status_ == CLOCK_STATUS_E::LAST) {
-        std::cout << " <Last>[" << iter->frame_id_ << "]" << std::endl;
+        std::cout << " <Last>[" << riter->frame_id_ << "]" << std::endl;
         this->clk_iter_ = riter;
         this->IncrClk();
         return *riter;
       } else if (riter->count_ == 0) {
         riter->clock_status_ = CLOCK_STATUS_E::LAST;
-        std::cout << " <First>[" << iter->frame_id_ << "]";
+        std::cout << " <First>[" << riter->frame_id_ << "]";
       } else {
         /* \brief This frame's count > 0 */
-        std::cout << " <Skip>[" << iter->frame_id_ << "]";
+        std::cout << " <Skip>[" << riter->frame_id_ << "]";
       }
     }
     std::cerr << "BMgr: " << __FUNC__
