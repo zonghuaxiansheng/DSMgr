@@ -13,6 +13,9 @@
 #define DB_PAGE_SIZE 4096
 
 #define __FUNC__ "_" << __func__ << "_L" << __LINE__ << "_"
+#define __HPRINT__(x) #ifdef HIGH_PRINT x #endif
+#define __MPRINT__(x) #ifdef MEDIUM_PRINT x #endif
+#define __LPRINT__(x) #ifdef LOW_PRINT x #endif
 
 namespace ustc_dbms {
 

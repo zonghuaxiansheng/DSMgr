@@ -45,12 +45,62 @@ bool BMgr::InitBMgrTest(int test_size) {
     this->hash_bucket_->Insert(std::make_pair(fcb.page_id_, fcb.frame_id_));
   }
 }
-int BMgr::WritePage(int page_id) {}
+int BMgr::WritePage(int page_id) {
+  __HPRINT__({
+  std::cout << "BMgr: " << __FUNC__ 
+            << " Write page_id[" << page_id << "]" 
+            << std::endl;
+  })
+  auto [frame_id, exist] = this->hash_bucket_->isExist(page_id);
+  // Buffer hit.
+  if (exist) {
+    // Write FCB.
+    this->SetDirty(frame_id);
+    return frame_id;
+  }
+  // Buffer miss.
+  __MPRINT__({
+  std::cout << "BMgr: " << __FUNC__ 
+            << " Buffer miss, need call DSMgr to read page back !" 
+            << std::endl;
+  })
+  // Read page from DSMgr
+  auto rd_frame = this->db_dsmgr_->ReadPage(page_id, 1);
+  auto& page_data = rd_frame.frame_[0].second;
+  // Using Clock algorithm to replace FCB.
+  auto& fcb = this->db_bcb_->PickFcbOut();
+  if (fcb.frame_status_ == FRAME_STATUS_E::DIRTY) {
+    /*
+     * \brief Frame is dirty now, need write back.
+     */
+    DbPage db_page;
+    dbCopy(fcb.dptr_, 0, db_page.page_, 0, DB_PAGE_SIZE);
+    DbFrame db_frame;
+    db_frame.frame_.push_back(std::make_pair(fcb.page_id_, db_page));
+    db_frame.dirty_ = true;
+    this->db_dsmgr_->WritePage(0, db_frame);
+  }
+  // Update FCB info & data.
+  fcb.page_id_ = page_id;
+  fcb.count_ = 0;
+  fcb.frame_status_ = FRAME_STATUS_E::DIRTY;
+  fcb.clock_status_ = CLOCK_STATUS_E::FIRST;
+  dbCopy(page_data.page_, 0, fcb.dptr_, 0, DB_PAGE_SIZE);
+  // Debug
+  // this->hash_bucket_->Print();
+  // Delete the bucket item which contains value=frame_id
+  this->hash_bucket_->Delete(fcb.frame_id_);
+  // Insert a new item into bucket.
+  this->hash_bucket_->Insert(std::make_pair(fcb.page_id_, fcb.frame_id_));
+  return fcb.frame_id_;
+}
 int BMgr::FixPage(int page_id,
                   int prot) {
+  __HPRINT__({
   std::cout << "BMgr: " << __FUNC__ 
             << " Fix page_id[" << page_id << "]" 
             << std::endl;
+  })
   auto [frame_id, exist] = this->hash_bucket_->isExist(page_id);
   // Buffer hit.
   if (exist) {
@@ -60,9 +110,11 @@ int BMgr::FixPage(int page_id,
     return frame_id;
   }
   // Buffer miss.
+  __MPRINT__({
   std::cout << "BMgr: " << __FUNC__ 
             << " Buffer miss, need call DSMgr to read page back !" 
             << std::endl;
+  })
   // Read page from DSMgr
   auto rd_frame = this->db_dsmgr_->ReadPage(page_id, 1);
   auto& page_data = rd_frame.frame_[0].second;
@@ -96,16 +148,20 @@ int BMgr::FixPage(int page_id,
 auto BMgr::FixNewPage() -> std::pair<int, int> {
   // Call DSMgr to new one page, then return meta data of the page.
   auto page_id = this->db_dsmgr_->NewPage();
+  __HPRINT__({
   std::cout << "BMgr: " << __FUNC__
             << " Call DSMgr and return logical_id[" << page_id << "]"
             << std::endl;
+  })
   auto frame_id = this->FixPage(page_id, 0);
   return std::make_pair(page_id, frame_id);
 }
 int BMgr::UnfixPage(int page_id) {
+  __HPRINT__({
   std::cout << "BMgr: " << __FUNC__
             << " Unfix page_id[" << page_id << "]"
             << std::endl;
+  })
   auto [frame_id, exist] = this->hash_bucket_->isExist(page_id);
   if (exist) {
     // Buffer hit.
@@ -118,9 +174,11 @@ int BMgr::UnfixPage(int page_id) {
   } else {
     // Buffer miss.
     // Do nothing.
+    __HPRINT__({
     std::cout << "BMgr :" << __FUNC__
               << " Unfix with a page which is not exist at buffer, so do nothing !"
               << std::endl;
+    })
     return 0;
   }
 }
@@ -134,9 +192,11 @@ void BMgr::SetDirty(int frame_id) {
 void BMgr::SetClean(int frame_id) {
   auto& fcb = this->db_bcb_->GetFcb(frame_id);
   if (fcb.frame_status_ == FRAME_STATUS_E::DIRTY) {
+    __MPRINT__({
     std::cout << "BMgr: " << __FUNC__
               << " Set a dirty frame to clean is dangerous !"
               << std::endl;
+    })
   }
   fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
 }

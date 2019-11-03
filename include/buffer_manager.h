@@ -339,6 +339,7 @@ class BMgr {
     int FixPage(int page_id, int prot);
     auto FixNewPage() -> std::pair<int, int>;
     int UnfixPage(int page_id);
+    int WritePage(int page_id);
     int NumFreeFrames();
     // Internal Functions
     // int SelectVictim();
