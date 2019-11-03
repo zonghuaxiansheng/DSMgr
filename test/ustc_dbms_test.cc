@@ -77,7 +77,7 @@ bool RunBMgrTraceTest(ustc_dbms::BMgr& bmgr,
 
 int main(void) {
 
-  int buffer_size = 1024;
+  int buffer_size = 1024*16;
   int bucket_size = 32;
   bool is_build = false;
   std::string db_path("out/data.dbf");
@@ -110,7 +110,7 @@ int main(void) {
   //           << " FixNewPage return with page_id[" << page_id
   //           << "] frame_id[" << frame_id << "]"
   //           << std::endl;
-  std::cout << "***********************USTC DBMS TEST***********************" << std::endl;
+  // std::cout << "***********************USTC DBMS TEST***********************" << std::endl;
   
   return 0;
 }
