@@ -15,7 +15,7 @@ int main(void) {
   bmgr.InitBMgrTest(1024);
   // bmgr.FixPage(6, 0);
   // bmgr.FixPage(20, 0);
-  for (int i = 0; i < 100; i ++) {
+  for (int i = 1; i < 100; i ++) {
     bmgr.FixPage(i, 0);
   }
   bmgr.SetDirty(10);
