@@ -272,6 +272,19 @@ struct HashBucket {
               << std::endl;
     return false;
   }
+  // Print
+  inline bool Print() {
+    std::cout << "BMgr: " << __FUNC__
+              << " * * * * HashBucket * * * *"
+              << std::endl;
+    for (auto map_ : this->bucket_) {
+      std::cout << "Sub_Bucket: <page_id , frame_id> ";
+      for (auto item : map_) {
+        std::cout << "<" << item.first << ", " << item.second << "> ";
+      }
+      std::cout << std::endl;
+    }
+  }
 };
 
 /*

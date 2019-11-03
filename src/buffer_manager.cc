@@ -60,7 +60,7 @@ int BMgr::FixPage(int page_id,
   }
   // Buffer miss.
   std::cout << "BMgr: " << __FUNC__ 
-            << " FixPage need call DSMgr to read page back !" 
+            << " Buffer miss, need call DSMgr to read page back !" 
             << std::endl;
   // Read page from DSMgr
   auto rd_frame = this->db_dsmgr_->ReadPage(page_id, 1);
@@ -84,6 +84,8 @@ int BMgr::FixPage(int page_id,
   fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
   fcb.clock_status_ = CLOCK_STATUS_E::FIRST;
   dbCopy(page_data.page_, 0, fcb.dptr_, 0, DB_PAGE_SIZE);
+  // Debug
+  this->hash_bucket_->Print();
   // Delete the bucket item which contains value=frame_id
   this->hash_bucket_->Delete(fcb.frame_id_);
   // Insert a new item into bucket.
