@@ -121,26 +121,35 @@ struct BCB {
      * \Step1. Search from current state to end state.
      * \Step2. Search from start state to current state.
      */
+    std::cout << "BMgr: " << __FUNC__
+              << " Clock scheduling start !"
+              << std::endl;
     for (auto iter = this->clk_iter_; iter != this->bcb_.end(); iter ++) {
       if (iter->clock_status_ == CLOCK_STATUS_E::LAST) {
+        std::cout << " <Last>[" << iter->frame_id_ << "]" << std::endl;
         this->clk_iter_ = iter;
         this->IncrClk();
         return *iter;
       } else if (iter->count_ == 0) {
         iter->clock_status_ = CLOCK_STATUS_E::LAST;
+        std::cout << " <First>[" << iter->frame_id_ << "]";
       } else {
         /* \brief This frame's count > 0 */
+        std::cout << " <Skip>[" << iter->frame_id_ << "]";
       }
     }
     for (auto riter = this->bcb_.begin(); riter != this->clk_iter_; riter ++) {
       if (riter->clock_status_ == CLOCK_STATUS_E::LAST) {
+        std::cout << " <Last>[" << iter->frame_id_ << "]" << std::endl;
         this->clk_iter_ = riter;
         this->IncrClk();
         return *riter;
       } else if (riter->count_ == 0) {
         riter->clock_status_ = CLOCK_STATUS_E::LAST;
+        std::cout << " <First>[" << iter->frame_id_ << "]";
       } else {
         /* \brief This frame's count > 0 */
+        std::cout << " <Skip>[" << iter->frame_id_ << "]";
       }
     }
     std::cerr << "BMgr: " << __FUNC__
