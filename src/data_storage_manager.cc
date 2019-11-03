@@ -17,7 +17,7 @@ namespace ustc_dbms {
 
   bool DSMgr::OpenDbFile(std::string file_name) {
     std::fstream *db_file = new std::fstream;
-    db_file->open(file_name,std::ios::in|std::ios::out);
+    db_file->open(file_name, std::ios::in|std::ios::out);
     if (!db_file->is_open()) {
       std::cerr << "DSMgr: " << __FUNC__
                 << " Read/Write db file failed !"
