@@ -128,30 +128,30 @@ struct BCB {
     while (true) {
       for (auto iter = this->clk_iter_; iter != this->bcb_.end(); iter ++) {
         if (iter->clock_status_ == CLOCK_STATUS_E::LAST) {
-          std::cout << " <Last>[" << iter->frame_id_ << "]" << std::endl;
+          std::cout << "<Last>[" << iter->frame_id_ << "] " << std::endl;
           this->clk_iter_ = iter;
           this->IncrClk();
           return *iter;
         } else if (iter->count_ == 0) {
           iter->clock_status_ = CLOCK_STATUS_E::LAST;
-          std::cout << " <First>[" << iter->frame_id_ << "]";
+          std::cout << "<First>[" << iter->frame_id_ << "] ";
         } else {
           /* \brief This frame's count > 0 */
-          std::cout << " <Skip>[" << iter->frame_id_ << "]";
+          std::cout << "<Skip>[" << iter->frame_id_ << "] ";
         }
       }
       for (auto riter = this->bcb_.begin(); riter != this->clk_iter_; riter ++) {
         if (riter->clock_status_ == CLOCK_STATUS_E::LAST) {
-          std::cout << " <Last>[" << riter->frame_id_ << "]" << std::endl;
+          std::cout << "<Last>[" << riter->frame_id_ << "] " << std::endl;
           this->clk_iter_ = riter;
           this->IncrClk();
           return *riter;
         } else if (riter->count_ == 0) {
           riter->clock_status_ = CLOCK_STATUS_E::LAST;
-          std::cout << " <First>[" << riter->frame_id_ << "]";
+          std::cout << "<First>[" << riter->frame_id_ << "] ";
         } else {
           /* \brief This frame's count > 0 */
-          std::cout << " <Skip>[" << riter->frame_id_ << "]";
+          std::cout << "<Skip>[" << riter->frame_id_ << "] ";
         }
       }
       loop_cnt ++;
@@ -339,10 +339,10 @@ class BMgr {
     int NumFreeFrames();
     // Internal Functions
     // int SelectVictim();
-    void RemoveBCB(BCB * ptr, int page_id);
-    void RemoveLRUEle(int frid);
+    // void RemoveBCB(BCB * ptr, int page_id);
+    // void RemoveLRUEle(int frid);
     void SetDirty(int frame_id);
-    void UnsetDirty(int frame_id);
+    void SetClean(int frame_id);
     void WriteDirtys();
     void PrintFrame(int frame_id);
 };    // class BMgr

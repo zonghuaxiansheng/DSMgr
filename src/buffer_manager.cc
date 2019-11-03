@@ -126,4 +126,41 @@ int BMgr::UnfixPage(int page_id) {
 int BMgr::NumFreeFrames() {
   return this->db_bcb_->GetFreeNum();
 }
+void BMgr::SetDirty(int frame_id) {
+  auto& fcb = this->db_bcb_->GetFcb();
+  fcb.frame_status_ = FRAME_STATUS_E::DIRTY;
+}
+void BMgr::SetClean(int frame_id) {
+  auto& fcb = this->db_bcb_->GetFcb();
+  if (fcb.frame_status_ == FRAME_STATUS_E::DIRTY) {
+    std::cout << "BMgr: " << __FUNC__
+              << " Set a dirty frame to clean is dangerous !"
+              << std::endl;
+  }
+  fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
+}
+void BMgr::WriteDirtys() {
+  // Write back all dirty frames.
+  for (auto& fcb : this->db_bcb_) {
+    if (fcb.frame_status_ == FRAME_STATUS_E::DIRTY) {
+      DbPage db_page;
+      dbCopy(fcb.dptr_, 0, db_page.page_, 0, DB_PAGE_SIZE);
+      DbFrame db_frame;
+      db_frame.frame_.push_back(std::make_pair(fcb.page_id_, db_page));
+      db_frame.dirty_ = true;
+      this->db_dsmgr_->WritePage(0, db_frame);
+    }
+  }
+}
+void BMgr::PrintFrame(int frame_id) {
+  auto& fcb = this->db_bcb_->GetFcb();
+  std::cout << "BMgr: " << __FUNC__
+            << " * * * * * * * Frame * * * * * *"
+            << std::endl;
+  std::cout << "* frame_id: " << fcb.frame_id_ << std::endl
+            << "* page_id: " << fcb.page_id_ << std::endl
+            << "* count: " << fcb.count_ << std::endl
+            << "* frame_status: " << fcb.frame_status_ << std::endl
+            << "* clock_status: " << fcb.clock_status_ << std::endl;
+}
 }
