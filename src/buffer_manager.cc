@@ -127,11 +127,11 @@ int BMgr::NumFreeFrames() {
   return this->db_bcb_->GetFreeNum();
 }
 void BMgr::SetDirty(int frame_id) {
-  auto& fcb = this->db_bcb_->GetFcb();
+  auto& fcb = this->db_bcb_->GetFcb(frame_id);
   fcb.frame_status_ = FRAME_STATUS_E::DIRTY;
 }
 void BMgr::SetClean(int frame_id) {
-  auto& fcb = this->db_bcb_->GetFcb();
+  auto& fcb = this->db_bcb_->GetFcb(frame_id);
   if (fcb.frame_status_ == FRAME_STATUS_E::DIRTY) {
     std::cout << "BMgr: " << __FUNC__
               << " Set a dirty frame to clean is dangerous !"
@@ -153,7 +153,7 @@ void BMgr::WriteDirtys() {
   }
 }
 void BMgr::PrintFrame(int frame_id) {
-  auto& fcb = this->db_bcb_->GetFcb();
+  auto& fcb = this->db_bcb_->GetFcb(frame_id);
   std::cout << "BMgr: " << __FUNC__
             << " * * * * * * * Frame * * * * * *"
             << std::endl;

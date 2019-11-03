@@ -16,11 +16,13 @@ int main(void) {
   // bmgr.FixPage(6, 0);
   // bmgr.FixPage(20, 0);
   for (int i = 0; i < 100; i ++) {
-    bmgr.FixPage(i);
+    bmgr.FixPage(i, 0);
   }
   bmgr.SetDirty(10);
   bmgr.SetDirty(20);
+  bmgr.PrintFrame(10);
   bmgr.SetClean(10);
+  bmgr.PrintFrame(10);
   bmgr.WriteDirtys();
   auto [page_id, frame_id] = bmgr.FixNewPage();
   std::cout << "Test: " << __FUNC__
