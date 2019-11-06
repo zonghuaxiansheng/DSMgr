@@ -183,10 +183,10 @@ class DSMgr {
     }
     void PrintIO() {
       std::cout << "DSMgr: " << __FUNC__
-                << std::endl
+                << std::endl << std::endl
                 << "* IO Details: <I>[" << this->r_cnt_ << "] <O>["
                 << this->w_cnt_ << "] <Total>[" << (this->r_cnt_ + this->w_cnt_) << "]"
-                << std::endl;
+                << std::endl << std::endl;
     }
     /*
      * \brief Release the db_handle's memory space.
