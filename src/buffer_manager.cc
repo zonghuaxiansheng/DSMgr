@@ -17,6 +17,8 @@ BMgr::BMgr(int bsize,
   // Initial DSMgr
   // std::string db_path = "./out/default.db";
   this->db_dsmgr_ = new DSMgr(db_path, is_build);
+  // Reset buffer hit count
+  this->ResetCnt();
 }
 BMgr::~BMgr() {
   // Release the memory space which buffer has allocated.
@@ -55,6 +57,8 @@ bool BMgr::InitBMgrTest(int test_size) {
   }
   this->db_dsmgr_->PrintIO();
   this->db_dsmgr_->ResetIO();
+  this->PrintCnt();
+  this->ResetCnt();
 }
 int BMgr::WritePage(int page_id) {
   __MPRINT__({
@@ -67,9 +71,11 @@ int BMgr::WritePage(int page_id) {
   if (exist) {
     // Write FCB.
     this->SetDirty(frame_id);
+    this->IncrHitCnt();
     return frame_id;
   }
   // Buffer miss.
+  this->IncrMissCnt();
   __MPRINT__({
   std::cout << "BMgr: " << __FUNC__ 
             << " Buffer miss, need call DSMgr to read page back !" 
@@ -116,11 +122,13 @@ int BMgr::FixPage(int page_id,
   // Buffer hit.
   if (exist) {
     // Update FCB count.
+    this->IncrHitCnt();
     auto& fcb = this->db_bcb_->GetFcb(frame_id);
     fcb.count_ ++;
     return frame_id;
   }
   // Buffer miss.
+  this->IncrMissCnt();
   __MPRINT__({
   std::cout << "BMgr: " << __FUNC__ 
             << " Buffer miss, need call DSMgr to read page back !" 

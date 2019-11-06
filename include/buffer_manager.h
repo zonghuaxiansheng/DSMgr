@@ -347,6 +347,10 @@ class BMgr {
      * \brief The size of the buffer.
      */
     int buffer_size_;
+    /* \brief Buffer hit cnt. */
+    int hit_cnt_;
+    /* \brief Buffer miss cnt. */
+    int miss_cnt_;
   public:
     BMgr(int bsize=1024,
          int hsize=128,
@@ -371,6 +375,24 @@ class BMgr {
     void SetClean(int frame_id);
     void WriteDirtys();
     void PrintFrame(int frame_id);
+
+    void ResetCnt() {
+      this->hit_cnt_ = 0;
+      this->miss_cnt_ = 0;
+    }
+    void IncrHitCnt() {
+      this->hit_cnt_ ++;
+    }
+    void IncrMissCnt() {
+      this->miss_cnt_ ++;
+    }
+    void PrintCnt() {
+      std::cout << "BMgr: " << __FUNC__
+                << std::endl
+                << " * Buffer Details: <hit_rate>[" 
+                << (this->hit_cnt_ + 0.0) / (this->hit_cnt_ + this->miss_cnt_) << "]"
+                << std::endl;
+    }
 };    // class BMgr
 
 }   // namespace ustc_dbms

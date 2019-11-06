@@ -71,6 +71,7 @@ bool RunBMgrTraceTest(ustc_dbms::BMgr& bmgr,
               << " Trace test done ..."
               << std::endl;
     bmgr.PrintIO();
+    bmgr.PrintCnt();
   }
   return true;
 }
