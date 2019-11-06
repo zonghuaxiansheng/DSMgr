@@ -388,10 +388,10 @@ class BMgr {
     }
     void PrintCnt() {
       std::cout << "BMgr: " << __FUNC__
-                << std::endl
-                << " * Buffer Details: <hit_rate>[" 
+                << std::endl << std::endl
+                << "* Buffer Details: <hit_rate>[" 
                 << (this->hit_cnt_ + 0.0) / (this->hit_cnt_ + this->miss_cnt_) << "]"
-                << std::endl;
+                << std::endl << std::endl;
     }
 };    // class BMgr
 
