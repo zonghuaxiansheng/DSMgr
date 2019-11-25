@@ -1,5 +1,6 @@
 #include "buffer_manager.h"
 // #include "data_storage_manager.h"
+#include <ctime>
 #include <iostream>
 
 enum OPS_E {R, W};
@@ -90,8 +91,18 @@ int main(void) {
                        bucket_size,
                        db_path,
                        is_build);
+  clock_t start_t, end_t;
+  start_t = clock();
   // Run BMgr trace test
   RunBMgrTraceTest(bmgr, trace_path, ~is_build);
+  end_t = clock();
+
+  auto& proc_t = (end_t - start_t) / CLOCKS_PER_SEC;
+
+  std::cout <<"Test: " << __FUNC__
+            << std::endl
+            << " * Time Details: <time>: " << proc_t << "(s)"
+            << std::endl;
 
   // bmgr.InitBMgrTest(1000);
   // for (int i = 1; i < 100; i ++) {
