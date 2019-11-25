@@ -97,12 +97,12 @@ int main(void) {
   RunBMgrTraceTest(bmgr, trace_path, ~is_build);
   end_t = clock();
 
-  auto& proc_t = (end_t - start_t) / CLOCKS_PER_SEC;
+  double proc_t = (double)(end_t - start_t) / CLOCKS_PER_SEC;
 
   std::cout <<"Test: " << __FUNC__
-            << std::endl
-            << " * Time Details: <time>: " << proc_t << "(s)"
-            << std::endl;
+            << std::endl << std::endl
+            << "* Time Details: <time>: " << proc_t << "(s)"
+            << std::endl << std::endl;
 
   // bmgr.InitBMgrTest(1000);
   // for (int i = 1; i < 100; i ++) {
