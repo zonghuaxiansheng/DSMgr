@@ -78,7 +78,7 @@ bool RunBMgrTraceTest(ustc_dbms::BMgr& bmgr,
 
 int main(void) {
 
-  int buffer_size = 1024*64;
+  int buffer_size = 1024*16;
   int bucket_size = 32;
   bool is_build = false;
   std::string db_path("out/data.dbf");
