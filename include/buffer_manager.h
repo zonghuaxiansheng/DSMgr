@@ -55,6 +55,8 @@ struct FCB {
   CLOCK_STATUS_E clock_status_;
   /* \brief Page data ptr. */
   char* dptr_;
+  /* \brief Frame age. */
+  int age_;
 };
 #endif
 
@@ -96,6 +98,7 @@ struct BCB {
       fcb.count_ = 0;
       fcb.frame_status_ = FRAME_STATUS_E::EMPTY;
       fcb.clock_status_ = CLOCK_STATUS_E::LAST;
+      fcb.age_ = 0;
       fcb.dptr_ = new char[DB_PAGE_SIZE * sizeof(char)];
       this->bcb_.push_back(fcb);
     }
@@ -119,8 +122,52 @@ struct BCB {
       this->clk_iter_ ++;
     }
   }
+  // IncrAge
+  inline void IncrAge(int frame_id) {
+    __MPRINT__({
+    std::cout << "BMgr: " << __FUNC__
+              << " LRU increasing age !"
+              << std::endl;
+    })
+    for (int i = 0; i < this->bcb_.size(); i ++) {
+      if (i == frame_id) {
+        this->bcb_[i].age_ = 0;
+      } else {
+        this->bcb_[i].age_ ++;
+      }
+    }
+  }
+  // PickFcbOut_LRU
+  inline FCB& PickFcbOut_LRU() {
+    __MPRINT__({
+    std::cout << "BMgr: " << __FUNC__
+              << " LRU scheduing start !"
+              << std::endl;
+    })
+    int oldset = 0;
+    int index = 0;
+    for (int i = 0; i < this->bcb_.size(); i ++) {
+    // for (auto& fcb : this->bcb_) {
+      auto& fcb = this->bcb_[i];
+      if (fcb.count_ == 0) {
+        if (oldset <= fcb.age_) {
+          oldset = fcb.age_;
+          index = i;
+        }
+      }
+    }
+
+    __MPRINT__({
+    std::cout << "BMgr: " << __FUNC__
+              << " LRU pick out frame " << index
+              << std::endl;
+    })
+
+    assert((index != 0) || ((index == 0) && (this->bcb_[index].count_ == 0)));
+    return this->bcb_[index];
+  }
   // PickFcbOut
-  inline FCB& PickFcbOut() {
+  inline FCB& PickFcbOut_CLK() {
     /*
      * \brief Turn the clock and search which has LAST tag, then pick it out. 
      * \Step1. Search from current state to end state.

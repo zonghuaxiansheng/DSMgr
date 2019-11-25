@@ -72,6 +72,9 @@ int BMgr::WritePage(int page_id) {
     // Write FCB.
     this->SetDirty(frame_id);
     this->IncrHitCnt();
+#ifdef USE_LRU
+    this->db_bcb_->IncrAge(frame_id);
+#endif
     return frame_id;
   }
   // Buffer miss.
@@ -84,8 +87,15 @@ int BMgr::WritePage(int page_id) {
   // Read page from DSMgr
   auto rd_frame = this->db_dsmgr_->ReadPage(page_id, 1);
   auto& page_data = rd_frame.frame_[0].second;
+
+#ifdef USE_LRU
+  // Using LRU algorithm to replace FCB.
+  auto& fcb = this->db_bcb_->PickFcbOut_LRU();
+#else
   // Using Clock algorithm to replace FCB.
-  auto& fcb = this->db_bcb_->PickFcbOut();
+  auto& fcb = this->db_bcb_->PickFcbOut_CLK();
+#endif
+
   if (fcb.frame_status_ == FRAME_STATUS_E::DIRTY) {
     /*
      * \brief Frame is dirty now, need write back.
@@ -100,9 +110,13 @@ int BMgr::WritePage(int page_id) {
   // Update FCB info & data.
   fcb.page_id_ = page_id;
   fcb.count_ = 0;
+  fcb.age_ = 0;
   fcb.frame_status_ = FRAME_STATUS_E::DIRTY;
   fcb.clock_status_ = CLOCK_STATUS_E::FIRST;
   dbCopy(page_data.page_, 0, fcb.dptr_, 0, DB_PAGE_SIZE);
+#ifdef USE_LRU
+  this->db_bcb_->IncrAge(frame_id);
+#endif
   // Debug
   // this->hash_bucket_->Print();
   // Delete the bucket item which contains value=frame_id
@@ -125,6 +139,9 @@ int BMgr::FixPage(int page_id,
     this->IncrHitCnt();
     auto& fcb = this->db_bcb_->GetFcb(frame_id);
     fcb.count_ ++;
+#ifdef USE_LRU
+    this->db_bcb_->IncrAge(frame_id);
+#endif
     return frame_id;
   }
   // Buffer miss.
@@ -137,8 +154,15 @@ int BMgr::FixPage(int page_id,
   // Read page from DSMgr
   auto rd_frame = this->db_dsmgr_->ReadPage(page_id, 1);
   auto& page_data = rd_frame.frame_[0].second;
+
+#ifdef USE_LRU
+  // Using LRU algorithm to replace FCB.
+  auto& fcb = this->db_bcb_->PickFcbOut_LRU();
+#else
   // Using Clock algorithm to replace FCB.
-  auto& fcb = this->db_bcb_->PickFcbOut();
+  auto& fcb = this->db_bcb_->PickFcbOut_CLK();
+#endif
+
   if (fcb.frame_status_ == FRAME_STATUS_E::DIRTY) {
     /*
      * \brief Frame is dirty now, need write back.
@@ -153,9 +177,13 @@ int BMgr::FixPage(int page_id,
   // Update FCB info & data.
   fcb.page_id_ = page_id;
   fcb.count_ = 1;
+  fcb.age_ = 0;
   fcb.frame_status_ = FRAME_STATUS_E::CLEAN;
   fcb.clock_status_ = CLOCK_STATUS_E::FIRST;
   dbCopy(page_data.page_, 0, fcb.dptr_, 0, DB_PAGE_SIZE);
+#ifdef USE_LRU
+  this->db_bcb_->IncrAge(fcb.frame_id_);
+#endif
   // Debug
   // this->hash_bucket_->Print();
   // Delete the bucket item which contains value=frame_id
